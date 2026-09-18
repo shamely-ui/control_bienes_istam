@@ -1,0 +1,427 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<style>
+
+/* Contenedor principal */
+.formulario-contenedor {
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+/* Encabezado */
+.formulario-titulo {
+    margin-bottom: 20px;
+}
+
+.formulario-titulo h2 {
+    color: #006633;
+    margin: 0 0 5px 0;
+}
+
+.formulario-titulo p {
+    color: #666;
+    margin: 0;
+}
+
+/* Tarjeta */
+.formulario-tarjeta {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
+    border-top: 4px solid #8bc34a;
+}
+
+/* Campos en dos columnas */
+.formulario-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 25px;
+}
+
+/* Cada campo */
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+}
+
+.campo-formulario label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+/* Inputs */
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background: white;
+}
+
+/* Efecto al seleccionar */
+.campo-formulario input:focus,
+.campo-formulario select:focus,
+.campo-formulario textarea:focus {
+    outline: none;
+    border-color: #8bc34a;
+    box-shadow: 0 0 0 2px rgba(139, 195, 74, 0.15);
+}
+
+/* Textarea */
+.campo-formulario textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+/* Campos largos */
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+/* Errores */
+.error-campo {
+    color: #b00020;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Botones */
+.formulario-botones {
+    margin-top: 25px;
+    display: flex;
+    gap: 10px;
+}
+
+.boton-cancelar {
+    display: inline-block;
+    padding: 9px 18px;
+    border: 1px solid #006633;
+    border-radius: 5px;
+    color: #006633;
+    text-decoration: none;
+    background: white;
+    font-weight: bold;
+}
+
+.boton-cancelar:hover {
+    background: #f1f8e9;
+}
+
+/* Celular */
+@media (max-width: 700px) {
+
+    .formulario-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-completo {
+        grid-column: auto;
+    }
+
+}
+
+</style>
+
+
+<div class="formulario-contenedor">
+
+    <!-- Encabezado -->
+    <div class="formulario-titulo">
+
+        <h2>
+            {% if form.instance.pk %}
+                ✏️ Editar bien
+            {% else %}
+                📦 Nuevo bien
+            {% endif %}
+        </h2>
+
+        <p>
+            Complete la información correspondiente al bien institucional.
+        </p>
+
+    </div>
+
+
+    <!-- Tarjeta -->
+    <div class="formulario-tarjeta">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <!-- Errores generales -->
+            {% if form.non_field_errors %}
+                <div class="error-campo">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+
+            <div class="formulario-grid">
+
+                <!-- Código -->
+                <div class="campo-formulario">
+                    <label for="{{ form.codigo.id_for_label }}">
+                        Código
+                    </label>
+
+                    {{ form.codigo }}
+                    <div class="error-campo">
+                        {{ form.codigo.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Nombre -->
+                <div class="campo-formulario">
+                    <label for="{{ form.nombre.id_for_label }}">
+                        Nombre
+                    </label>
+
+                    {{ form.nombre }}
+                    <div class="error-campo">
+                        {{ form.nombre.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Categoría -->
+                <div class="campo-formulario">
+                    <label for="{{ form.categoria.id_for_label }}">
+                        Categoría
+                    </label>
+
+                    {{ form.categoria }}
+                    <div class="error-campo">
+                        {{ form.categoria.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Ubicación -->
+                <div class="campo-formulario">
+                    <label for="{{ form.ubicacion.id_for_label }}">
+                        Ubicación
+                    </label>
+
+                    {{ form.ubicacion }}
+                    <div class="error-campo">
+                        {{ form.ubicacion.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Tipo -->
+                <div class="campo-formulario">
+                    <label for="{{ form.tipo_bien.id_for_label }}">
+                        Tipo de bien
+                    </label>
+
+                    {{ form.tipo_bien }}
+                    <div class="error-campo">
+                        {{ form.tipo_bien.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Marca -->
+                <div class="campo-formulario">
+                    <label for="{{ form.marca.id_for_label }}">
+                        Marca
+                    </label>
+
+                    {{ form.marca }}
+                    <div class="error-campo">
+                        {{ form.marca.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Modelo -->
+                <div class="campo-formulario">
+                    <label for="{{ form.modelo.id_for_label }}">
+                        Modelo
+                    </label>
+
+                    {{ form.modelo }}
+                    <div class="error-campo">
+                        {{ form.modelo.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Serie -->
+                <div class="campo-formulario">
+                    <label for="{{ form.serie.id_for_label }}">
+                        Serie
+                    </label>
+
+                    {{ form.serie }}
+                    <div class="error-campo">
+                        {{ form.serie.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Valor -->
+                <div class="campo-formulario">
+                    <label for="{{ form.valor_compra.id_for_label }}">
+                        Valor de compra
+                    </label>
+
+                    {{ form.valor_compra }}
+                    <div class="error-campo">
+                        {{ form.valor_compra.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Color -->
+                <div class="campo-formulario">
+                    <label for="{{ form.color.id_for_label }}">
+                        Color
+                    </label>
+
+                    {{ form.color }}
+                    <div class="error-campo">
+                        {{ form.color.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Material -->
+                <div class="campo-formulario">
+                    <label for="{{ form.material.id_for_label }}">
+                        Material
+                    </label>
+
+                    {{ form.material }}
+                    <div class="error-campo">
+                        {{ form.material.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Estado -->
+                <div class="campo-formulario">
+                    <label for="{{ form.estado.id_for_label }}">
+                        Estado
+                    </label>
+
+                    {{ form.estado }}
+                    <div class="error-campo">
+                        {{ form.estado.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Alto -->
+                <div class="campo-formulario">
+                    <label for="{{ form.alto.id_for_label }}">
+                        Alto
+                    </label>
+
+                    {{ form.alto }}
+                    <div class="error-campo">
+                        {{ form.alto.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Ancho -->
+                <div class="campo-formulario">
+                    <label for="{{ form.ancho.id_for_label }}">
+                        Ancho
+                    </label>
+
+                    {{ form.ancho }}
+                    <div class="error-campo">
+                        {{ form.ancho.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Profundidad -->
+                <div class="campo-formulario">
+                    <label for="{{ form.profundidad.id_for_label }}">
+                        Profundidad
+                    </label>
+
+                    {{ form.profundidad }}
+                    <div class="error-campo">
+                        {{ form.profundidad.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Características -->
+                <div class="campo-formulario campo-completo">
+                    <label for="{{ form.caracteristicas.id_for_label }}">
+                        Características
+                    </label>
+
+                    {{ form.caracteristicas }}
+                    <div class="error-campo">
+                        {{ form.caracteristicas.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Observaciones -->
+                <div class="campo-formulario campo-completo">
+                    <label for="{{ form.observaciones.id_for_label }}">
+                        Observaciones
+                    </label>
+
+                    {{ form.observaciones }}
+                    <div class="error-campo">
+                        {{ form.observaciones.errors }}
+                    </div>
+                </div>
+
+
+                <!-- Activo -->
+                <div class="campo-formulario">
+                    <label>
+                        {{ form.activo }}
+                        Activo
+                    </label>
+
+                    <div class="error-campo">
+                        {{ form.activo.errors }}
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Botones -->
+            <div class="formulario-botones">
+
+                <button type="submit" class="boton">
+                    💾 Guardar
+                </button>
+
+                <a href="{% url 'lista_bienes' %}"
+                   class="boton-cancelar">
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

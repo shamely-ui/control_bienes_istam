@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sistema de Control de Bienes ISTAM</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'inventario/css/estilos.css' %}"
+    >
+</head>
+
+<body>
+
+    {% if user.is_authenticated %}
+
+        <!-- Encabezado del sistema -->
+        <header class="barra-superior">
+
+            <div class="logo-area">
+
+                <img
+                    src="{% static 'inventario/img/logo_istam.jpg' %}"
+                    alt="Logo ISTAM"
+                    class="logo-header"
+                >
+
+                <div class="titulo-sistema">
+                    <h1>Sistema de Control de Bienes</h1>
+                    <p>Instituto Superior Tecnológico Amazónico</p>
+                </div>
+
+            </div>
+
+
+            <!-- Usuario -->
+            <div class="usuario-header">
+
+                <div class="usuario-datos">
+
+                    <span class="usuario-icono">👤</span>
+
+                    <div>
+                        <small>Bienvenida,</small>
+                        <strong>{{ user.username }}</strong>
+                    </div>
+
+                </div>
+
+                <a href="{% url 'logout' %}" class="boton-salir">
+                    Cerrar sesión
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- Menú principal -->
+        <nav class="menu-principal">
+
+            {% with pagina=request.resolver_match.url_name %}
+
+                <a href="{% url 'dashboard' %}"
+                   class="menu-item {% if pagina == 'dashboard' %}menu-activo{% endif %}">
+
+                    <span class="menu-icono">🏠</span>
+                    Inicio
+
+                </a>
+
+
+                <a href="{% url 'lista_bienes' %}"
+                   class="menu-item {% if pagina == 'lista_bienes' %}menu-activo{% endif %}">
+
+                    <span class="menu-icono">📦</span>
+                    Bienes
+
+                </a>
+
+
+                <a href="{% url 'lista_custodios' %}"
+                   class="menu-item {% if pagina == 'lista_custodios' %}menu-activo{% endif %}">
+
+                    <span class="menu-icono">👥</span>
+                    Custodios
+
+                </a>
+
+
+                <a href="{% url 'lista_asignaciones' %}"
+                   class="menu-item {% if pagina == 'lista_asignaciones' %}menu-activo{% endif %}">
+
+                    <span class="menu-icono">📋</span>
+                    Asignaciones
+
+                </a>
+
+
+                <a href="{% url 'lista_constataciones' %}"
+                   class="menu-item {% if pagina == 'lista_constataciones' %}menu-activo{% endif %}">
+
+                    <span class="menu-icono">✅</span>
+                    Constataciones
+
+                </a>
+
+
+                <a href="{% url 'reportes' %}"
+                   class="menu-item {% if pagina == 'reportes' %}menu-activo{% endif %}">
+
+                    <span class="menu-icono">📊</span>
+                    Reportes
+
+                </a>
+
+            {% endwith %}
+
+        </nav>
+
+    {% endif %}
+
+
+    <!-- Contenido de cada página -->
+    <main class="{% if user.is_authenticated %}contenido{% else %}contenido-login{% endif %}">
+
+        {% block contenido %}
+        {% endblock %}
+
+    </main>
+
+
+    {% if user.is_authenticated %}
+
+        <!-- Pie de página -->
+        <footer class="pie-sistema">
+
+            <!-- Información central -->
+            <div class="pie-centro">
+
+                <p>
+                    <strong>Sistema de Control de Bienes ISTAM</strong>
+                </p>
+
+                <p>
+                    Desarrollado por Shamely Estefanía Castillo Guayllas © 2026
+                </p>
+
+            </div>
+
+
+            <!-- Lema institucional -->
+            <div class="pie-lema">
+
+                <span>
+                    Tecnología para un mejor futuro
+                </span>
+
+                <span class="pie-hoja">
+                    🌿
+                </span>
+
+            </div>
+
+        </footer>
+
+    {% endif %}
+
+</body>
+</html>

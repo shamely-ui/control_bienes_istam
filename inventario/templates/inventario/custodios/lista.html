@@ -1,0 +1,359 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<style>
+
+/* El reporte permanece oculto en pantalla */
+.reporte-impresion {
+    display: none;
+}
+
+/* Encabezado del reporte */
+.encabezado-reporte {
+    position: relative;
+    min-height: 95px;
+    margin-bottom: 10px;
+}
+
+/* Logo institucional */
+.logo-reporte {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 95px;
+    height: auto;
+}
+
+/* Texto central del reporte */
+.texto-reporte {
+    width: 100%;
+    text-align: center;
+    padding-top: 5px;
+}
+
+.texto-reporte h2 {
+    margin: 0;
+}
+
+.texto-reporte p {
+    margin: 2px 0;
+}
+
+
+/* Configuración para imprimir */
+@media print {
+
+    header,
+    nav,
+    footer,
+    .pie-sistema,
+    .vista-pantalla {
+        display: none !important;
+    }
+
+    .reporte-impresion {
+        display: block !important;
+    }
+
+    .reporte-impresion table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        font-size: 10px;
+    }
+
+    .reporte-impresion th,
+    .reporte-impresion td {
+        border: 1px solid #333;
+        padding: 5px;
+        text-align: left;
+    }
+
+    .reporte-impresion th {
+        background: #eeeeee !important;
+        color: black !important;
+    }
+
+}
+
+</style>
+
+
+<!-- =====================================================
+     VISTA NORMAL DEL SISTEMA
+     ===================================================== -->
+
+<div class="vista-pantalla">
+
+    <!-- Encabezado -->
+    <div class="modulo-cabecera">
+
+        <div>
+            <h2>👥 Custodios</h2>
+            <p>Lista de custodios registrados en el sistema.</p>
+        </div>
+
+        <div class="modulo-acciones">
+
+            <a href="{% url 'nuevo_custodio' %}"
+               class="boton">
+                + Nuevo custodio
+            </a>
+
+            <a href="{% url 'importar_custodios' %}"
+               class="boton boton-secundario">
+                📥 Importar custodios
+            </a>
+
+            <button type="button"
+                    class="boton"
+                    onclick="window.print()">
+                🖨️ Imprimir reporte
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Tabla normal -->
+    <div class="tabla-contenedor">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Cédula</th>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Cargo</th>
+                    <th>Departamento</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for custodio in custodios %}
+
+                <tr>
+
+                    <td>{{ custodio.cedula }}</td>
+
+                    <td>{{ custodio.nombres }}</td>
+
+                    <td>{{ custodio.apellidos }}</td>
+
+                    <td>{{ custodio.cargo }}</td>
+
+                    <td>{{ custodio.departamento }}</td>
+
+                    <!-- Estado -->
+                    <td>
+
+                        {% if custodio.activo %}
+
+                            <span class="estado-activo">
+                                Activo
+                            </span>
+
+                        {% else %}
+
+                            <span class="estado-inactivo">
+                                Inactivo
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- Acciones -->
+                    <td>
+
+                        <div class="acciones-botones">
+
+                            <a href="{% url 'editar_custodio' custodio.id %}"
+                               class="btn-accion btn-editar">
+                                ✏️ Editar
+                            </a>
+
+                            <a href="{% url 'cambiar_estado_custodio' custodio.id %}"
+                               class="btn-accion btn-estado">
+
+                                {% if custodio.activo %}
+                                    Desactivar
+                                {% else %}
+                                    Activar
+                                {% endif %}
+
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="7"
+                        class="tabla-vacia">
+                        No hay custodios registrados.
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- Resumen -->
+    <div class="resumen-tabla">
+
+        ℹ️ Mostrando
+        {{ custodios|length }}
+        custodio(s) registrado(s).
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     REPORTE PARA IMPRESIÓN
+     ===================================================== -->
+
+<div class="reporte-impresion">
+
+
+    <!-- Encabezado institucional -->
+    <div class="encabezado-reporte">
+
+        <img
+            src="/static/inventario/img/logo_istam.jpg"
+            alt="Logo ISTAM"
+            class="logo-reporte"
+        >
+
+        <div class="texto-reporte">
+
+            <h2>
+                Instituto Superior Tecnológico Amazónico
+            </h2>
+
+            <p>
+                <strong>Reporte de Custodios</strong>
+            </p>
+
+            <p>
+                Fecha de generación:
+                {% now "d/m/Y" %}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Tabla completa del reporte -->
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Cédula</th>
+                <th>Nombres y apellidos</th>
+                <th>Cargo</th>
+                <th>Departamento</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for custodio in custodios %}
+
+            <tr>
+
+                <td>
+                    {{ custodio.cedula }}
+                </td>
+
+                <td>
+                    {{ custodio.nombres }}
+                    {{ custodio.apellidos }}
+                </td>
+
+                <td>
+                    {{ custodio.cargo|default:"-" }}
+                </td>
+
+                <td>
+                    {{ custodio.departamento|default:"-" }}
+                </td>
+
+                <td>
+                    {{ custodio.correo|default:"-" }}
+                </td>
+
+                <td>
+                    {{ custodio.telefono|default:"-" }}
+                </td>
+
+                <td>
+
+                    {% if custodio.activo %}
+                        Activo
+                    {% else %}
+                        Inactivo
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="7">
+                    No hay custodios registrados.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+
+    <!-- Total -->
+    <p style="margin-top: 10px; text-align: right;">
+
+        <strong>
+            Total de custodios:
+            {{ custodios|length }}
+        </strong>
+
+    </p>
+
+</div>
+
+{% endblock %}

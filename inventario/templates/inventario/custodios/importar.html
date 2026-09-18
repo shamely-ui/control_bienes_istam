@@ -1,0 +1,56 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<!-- Encabezado -->
+<div class="modulo-cabecera">
+
+    <div>
+        <h2>📥 Importar custodios</h2>
+        <p>Cargue un archivo Excel con los custodios del ISTAM.</p>
+    </div>
+
+    <div class="modulo-acciones">
+        <a href="{% url 'lista_custodios' %}" class="boton-limpiar">
+            ← Volver
+        </a>
+    </div>
+
+</div>
+
+
+<!-- Formulario -->
+<div class="formulario-importacion">
+
+    <p>
+        <strong>El archivo Excel debe contener las columnas:</strong>
+    </p>
+
+    <p class="texto-secundario">
+        Cédula | Nombres | Apellidos | Cargo | Departamento | Correo | Teléfono
+    </p>
+
+    <form method="post" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit" class="boton">
+            📥 Importar custodios
+        </button>
+
+    </form>
+
+
+    {% if mensaje %}
+
+        <div class="mensaje-importacion">
+            {{ mensaje }}
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

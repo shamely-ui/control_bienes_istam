@@ -1,0 +1,67 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<h2>Categorías</h2>
+
+<!-- Botón para registrar una categoría -->
+<a href="{% url 'nueva_categoria' %}" class="boton">
+    Nueva categoría
+</a>
+
+<p>Lista de categorías registradas en el sistema.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for categoria in categorias %}
+        <tr>
+            <td>{{ categoria.nombre }}</td>
+
+            <td>{{ categoria.descripcion }}</td>
+
+            <td>
+                {% if categoria.activo %}
+                    Activa
+                {% else %}
+                    Inactiva
+                {% endif %}
+            </td>
+
+            <td>
+                <a href="{% url 'editar_categoria' categoria.id %}" class="accion-editar">
+                    Editar
+                </a>
+
+                <br>
+                
+                <a href="{% url 'cambiar_estado_categoria' categoria.id %}">
+                    {% if categoria.activo %}
+                        Desactivar
+                    {% else %}
+                        Activar
+                    {% endif %}
+                </a>
+
+            </td>
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="4">
+                No hay categorías registradas.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

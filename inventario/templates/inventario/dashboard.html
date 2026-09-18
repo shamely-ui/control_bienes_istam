@@ -1,0 +1,61 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<div class="dashboard-cabecera">
+
+    <div>
+        <h2>Panel principal</h2>
+
+        <p class="bienvenida">
+            Bienvenida al Sistema de Control de Bienes Institucionales del ISTAM.
+        </p>
+    </div>
+
+</div>
+
+
+<div class="tarjetas">
+
+    <div class="tarjeta">
+        <div class="tarjeta-icono">📦</div>
+
+        <div>
+            <h3>Total de bienes</h3>
+            <p>{{ total_bienes }}</p>
+        </div>
+    </div>
+
+
+    <div class="tarjeta">
+        <div class="tarjeta-icono">📋</div>
+
+        <div>
+            <h3>Bienes asignados</h3>
+            <p>{{ bienes_asignados }}</p>
+        </div>
+    </div>
+
+
+    <div class="tarjeta">
+        <div class="tarjeta-icono">✅</div>
+
+        <div>
+            <h3>Disponibles</h3>
+            <p>{{ disponibles }}</p>
+        </div>
+    </div>
+
+
+    <div class="tarjeta">
+        <div class="tarjeta-icono">📁</div>
+
+        <div>
+            <h3>Dados de baja</h3>
+            <p>{{ dados_baja }}</p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

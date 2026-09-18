@@ -1,0 +1,515 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<style>
+
+/* El reporte permanece oculto en pantalla */
+.reporte-impresion {
+    display: none;
+}
+
+/* Encabezado del reporte */
+.encabezado-reporte {
+    position: relative;
+    min-height: 95px;
+    margin-bottom: 10px;
+}
+
+/* Logo institucional */
+.logo-reporte {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 95px;
+    height: auto;
+}
+
+/* Texto central del reporte */
+.texto-reporte {
+    width: 100%;
+    text-align: center;
+    padding-top: 5px;
+}
+
+.texto-reporte h2 {
+    margin: 0;
+}
+
+.texto-reporte p {
+    margin: 2px 0;
+}
+
+/* Configuración para imprimir */
+@media print {
+
+    header,
+    nav,
+    footer,
+    .pie-sistema,
+    .vista-pantalla {
+        display: none !important;
+    }
+
+    .reporte-impresion {
+        display: block !important;
+    }
+
+    .reporte-impresion table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        font-size: 10px;
+    }
+
+    .reporte-impresion th,
+    .reporte-impresion td {
+        border: 1px solid #333;
+        padding: 5px;
+        text-align: left;
+    }
+
+    .reporte-impresion th {
+        background: #eeeeee !important;
+        color: black !important;
+    }
+}
+
+</style>
+
+
+<!-- =====================================================
+     VISTA NORMAL DEL SISTEMA
+     ===================================================== -->
+
+<div class="vista-pantalla">
+
+    <!-- Encabezado -->
+    <div class="modulo-cabecera">
+
+        <div>
+            <h2>📋 Asignaciones</h2>
+            <p>Lista de bienes asignados a custodios.</p>
+        </div>
+
+        <div class="modulo-acciones">
+
+            <!-- Nueva asignación -->
+            <a href="{% url 'nueva_asignacion' %}"
+               class="boton">
+                + Nueva asignación
+            </a>
+
+            <!-- Importar matriz -->
+            <a href="{% url 'importar_matriz_actas' %}"
+               class="boton">
+                📥 Importar matriz
+            </a>
+
+            <!-- Imprimir reporte -->
+            <button
+                type="button"
+                class="boton"
+                onclick="window.print()">
+                🖨️ Imprimir reporte
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Buscador y filtro -->
+    <form method="get" class="filtros-asignaciones">
+
+        <div class="buscador-campo">
+
+            <span>🔎</span>
+
+            <input
+                type="text"
+                name="buscar"
+                placeholder="Buscar por bien, código, custodio o número de acta"
+                value="{{ buscar }}"
+            >
+
+        </div>
+
+        <select name="estado" class="filtro-select">
+
+            <option value="">
+                Todos
+            </option>
+
+            <option
+                value="pendiente"
+                {% if estado == 'pendiente' %}selected{% endif %}
+            >
+                Pendientes
+            </option>
+
+            <option
+                value="devuelto"
+                {% if estado == 'devuelto' %}selected{% endif %}
+            >
+                Devueltos
+            </option>
+
+        </select>
+
+        <button type="submit" class="boton">
+            Buscar
+        </button>
+
+        <a href="{% url 'lista_asignaciones' %}"
+           class="boton-limpiar">
+            Limpiar
+        </a>
+
+    </form>
+
+
+    <!-- Tabla normal -->
+    <div class="tabla-contenedor">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Bien</th>
+                    <th>Custodio</th>
+                    <th>Fecha asignación</th>
+                    <th>Fecha devolución</th>
+                    <th>Observaciones</th>
+                    <th>Acciones</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for asignacion in asignaciones %}
+
+                <tr>
+
+                    <!-- Bien -->
+                    <td>
+
+                        <strong>
+                            {{ asignacion.bien.nombre }}
+                        </strong>
+
+                        <div class="texto-secundario">
+
+                            {% if asignacion.bien.codigo %}
+                                {{ asignacion.bien.codigo }}
+                            {% else %}
+                                Sin código
+                            {% endif %}
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- Custodio -->
+                    <td>
+                        {{ asignacion.custodio }}
+                    </td>
+
+
+                    <!-- Fecha de asignación -->
+                    <td>
+
+                        {% if asignacion.fecha_asignacion %}
+
+                            {{ asignacion.fecha_asignacion|date:"d/m/Y" }}
+
+                        {% else %}
+
+                            <span class="estado-pendiente">
+                                Sin fecha registrada
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- Fecha de devolución -->
+                    <td>
+
+                        {% if asignacion.fecha_devolucion %}
+
+                            <span class="estado-devuelto">
+                                Devuelto
+                            </span>
+
+                            <div class="texto-secundario">
+                                {{ asignacion.fecha_devolucion|date:"d/m/Y" }}
+                            </div>
+
+                        {% else %}
+
+                            <span class="estado-pendiente">
+                                Pendiente
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- Observaciones -->
+                    <td>
+                        {{ asignacion.observaciones|default:"Sin observaciones" }}
+                    </td>
+
+
+                    <!-- Acciones -->
+                    <td>
+
+                        <div class="acciones-botones">
+
+                            <!-- Editar -->
+                            <a
+                                href="{% url 'editar_asignacion' asignacion.id %}"
+                                class="btn-accion btn-editar"
+                            >
+                                ✏️ Editar
+                            </a>
+
+                            <!-- Ver acta -->
+                            <a
+                                href="{% url 'acta_asignacion' asignacion.id %}"
+                                class="btn-accion btn-acta"
+                            >
+                                📄 Ver acta
+                            </a>
+
+                            <!-- Registrar devolución -->
+                            {% if not asignacion.fecha_devolucion %}
+
+                                <a
+                                    href="{% url 'registrar_devolucion' asignacion.id %}"
+                                    class="btn-accion btn-devolucion"
+                                >
+                                    ↩ Registrar devolución
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="6"
+                        class="tabla-vacia">
+
+                        No hay asignaciones registradas.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- Resumen -->
+    <div class="resumen-tabla">
+
+        ℹ️ Mostrando
+        {{ asignaciones|length }}
+        asignación(es) registrada(s).
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     REPORTE PARA IMPRESIÓN
+     ===================================================== -->
+
+<div class="reporte-impresion">
+
+    <!-- Encabezado institucional -->
+    <div class="encabezado-reporte">
+
+        <img
+            src="/static/inventario/img/logo_istam.jpg"
+            alt="Logo ISTAM"
+            class="logo-reporte"
+        >
+
+        <div class="texto-reporte">
+
+            <h2>
+                Instituto Superior Tecnológico Amazónico
+            </h2>
+
+            <p>
+                <strong>
+                    Reporte de Asignaciones
+                </strong>
+            </p>
+
+            <p>
+                Fecha de generación:
+                {% now "d/m/Y" %}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Tabla del reporte -->
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>N.º de acta</th>
+                <th>Bien</th>
+                <th>Código</th>
+                <th>Custodio</th>
+                <th>Fecha asignación</th>
+                <th>Estado</th>
+                <th>Fecha devolución</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for asignacion in asignaciones %}
+
+            <tr>
+
+                <!-- Número de acta -->
+                <td>
+                    {{ asignacion.numero_acta|default:"-" }}
+                </td>
+
+
+                <!-- Bien -->
+                <td>
+                    {{ asignacion.bien.nombre }}
+                </td>
+
+
+                <!-- Código -->
+                <td>
+
+                    {% if asignacion.bien.codigo %}
+
+                        {{ asignacion.bien.codigo }}
+
+                    {% else %}
+
+                        Sin código
+
+                    {% endif %}
+
+                </td>
+
+
+                <!-- Custodio -->
+                <td>
+                    {{ asignacion.custodio }}
+                </td>
+
+
+                <!-- Fecha de asignación -->
+                <td>
+
+                    {% if asignacion.fecha_asignacion %}
+
+                        {{ asignacion.fecha_asignacion|date:"d/m/Y" }}
+
+                    {% else %}
+
+                        Sin fecha registrada
+
+                    {% endif %}
+
+                </td>
+
+
+                <!-- Estado -->
+                <td>
+
+                    {% if asignacion.fecha_devolucion %}
+
+                        Devuelto
+
+                    {% else %}
+
+                        Pendiente
+
+                    {% endif %}
+
+                </td>
+
+
+                <!-- Fecha de devolución -->
+                <td>
+
+                    {% if asignacion.fecha_devolucion %}
+
+                        {{ asignacion.fecha_devolucion|date:"d/m/Y" }}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="7">
+                    No hay asignaciones registradas.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+
+    <!-- Total de asignaciones -->
+    <p style="margin-top: 10px; text-align: right;">
+
+        <strong>
+            Total de asignaciones:
+            {{ asignaciones|length }}
+        </strong>
+
+    </p>
+
+</div>
+
+{% endblock %}

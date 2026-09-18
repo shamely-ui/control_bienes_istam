@@ -1,0 +1,303 @@
+{% extends 'inventario/base.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<div class="acta">
+
+    <!-- Encabezado -->
+    <div class="acta-encabezado">
+
+        <img
+            src="{% static 'inventario/img/logo_istam.jpg' %}"
+            alt="Logo ISTAM"
+            class="acta-logo"
+        >
+
+        <div>
+            <h2>INSTITUTO SUPERIOR TECNOLÓGICO AMAZÓNICO</h2>
+            <h3>ACTA DE ENTREGA - RECEPCIÓN</h3>
+
+            <p>
+                <strong>
+                    ACTA N.º {{ asignacion.numero_acta|default:"Sin número" }}
+                </strong>
+            </p>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <!-- Introducción -->
+    <p>
+        Por medio de la presente se deja constancia de la entrega temporal
+        del siguiente bien perteneciente al Instituto Superior Tecnológico
+        Amazónico, para su uso y custodia.
+    </p>
+
+
+    <!-- Datos del bien -->
+    <h3>Datos del bien</h3>
+
+    <table class="tabla-acta">
+
+        <tr>
+            <th style="color: black !important;">Bien</th>
+            <td>{{ asignacion.bien.nombre }}</td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Código</th>
+            <td>
+                {{ asignacion.bien.codigo|default:"Sin código asignado" }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Marca</th>
+            <td>
+                {{ asignacion.bien.marca|default:"No registrado" }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Modelo</th>
+            <td>
+                {{ asignacion.bien.modelo|default:"No registrado" }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">N.º de serie</th>
+            <td>
+                {{ asignacion.bien.serie|default:"No registrado" }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Valor</th>
+            <td>
+                {% if asignacion.bien.valor_compra %}
+                    $ {{ asignacion.bien.valor_compra }}
+                {% else %}
+                    No registrado
+                {% endif %}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Estado</th>
+            <td>
+                {{ asignacion.bien.estado }}
+            </td>
+        </tr>
+
+    </table>
+
+
+    <!-- Accesorios -->
+    <h3>Accesorios entregados</h3>
+
+    <table class="tabla-acta">
+
+        <tr>
+            <th style="color: black !important;">Detalle</th>
+
+            <td>
+                {{ asignacion.bien.caracteristicas|default:"No se registraron accesorios"|linebreaksbr }}
+            </td>
+        </tr>
+
+    </table>
+
+
+    <!-- Datos del custodio -->
+    <h3>Datos del custodio</h3>
+
+    <table class="tabla-acta">
+
+        <tr>
+            <th style="color: black !important;">Nombre</th>
+
+            <td>
+                {{ asignacion.custodio.nombres }}
+                {{ asignacion.custodio.apellidos }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Cédula</th>
+            <td>
+                {{ asignacion.custodio.cedula }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Cargo</th>
+            <td>
+                {{ asignacion.custodio.cargo|default:"No registrado" }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Carrera</th>
+            <td>
+                {{ asignacion.custodio.carrera|default:"No registrado" }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Ciclo</th>
+            <td>
+                {{ asignacion.custodio.ciclo|default:"No registrado" }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Teléfono</th>
+            <td>
+                {{ asignacion.custodio.telefono|default:"No registrado" }}
+            </td>
+        </tr>
+
+        <tr>
+            <th style="color: black !important;">Dirección</th>
+            <td>
+                {{ asignacion.custodio.direccion|default:"No registrado" }}
+            </td>
+        </tr>
+
+    </table>
+
+
+    <!-- Datos de la entrega -->
+    <h3>Datos de la entrega</h3>
+
+    <p>
+        <strong>Fecha de entrega:</strong>
+
+        {% if asignacion.fecha_asignacion %}
+            {{ asignacion.fecha_asignacion|date:"d/m/Y" }}
+        {% else %}
+            Pendiente
+        {% endif %}
+    </p>
+
+    <p>
+        <strong>Observaciones:</strong>
+        {{ asignacion.observaciones|default:"Sin observaciones" }}
+    </p>
+
+
+    <!-- Condiciones -->
+    <h3>Condiciones de uso y responsabilidad</h3>
+
+    <p>
+        El bien entregado será utilizado exclusivamente para actividades
+        relacionadas con las funciones o actividades autorizadas por el
+        Instituto Superior Tecnológico Amazónico.
+    </p>
+
+    <p>
+        El custodio se compromete a:
+    </p>
+
+    <ol>
+
+        <li>
+            Mantener el bien y sus accesorios en buen estado de conservación.
+        </li>
+
+        <li>
+            No prestar, vender, transferir, desarmar, modificar ni entregar
+            el bien a terceras personas.
+        </li>
+
+        <li>
+            Informar inmediatamente cualquier daño, pérdida, robo,
+            deterioro o novedad relacionada con el bien.
+        </li>
+
+        <li>
+            Permitir la revisión del bien cuando la institución lo requiera.
+        </li>
+
+        <li>
+            Devolver el bien en las mismas condiciones en las que fue
+            recibido, salvo el desgaste normal por su utilización.
+        </li>
+
+        <li>
+            Asumir la responsabilidad correspondiente en caso de pérdida,
+            daño, mal uso o falta de devolución.
+        </li>
+
+    </ol>
+
+    <p>
+        Se deja constancia de que el bien pertenece al Instituto Superior
+        Tecnológico Amazónico y que su uso, conservación, custodia y
+        devolución estarán sujetos a las disposiciones institucionales
+        aplicables.
+    </p>
+
+
+    <!-- Fecha de generación -->
+    <p class="fecha-generacion">
+
+        <strong>Fecha de generación:</strong>
+        {% now "d/m/Y" %}
+
+    </p>
+
+
+    <!-- Firmas -->
+    <div class="firmas-acta">
+
+        <div>
+
+            <p>________________________________</p>
+
+            <strong>ENTREGA CONFORME</strong>
+
+            <p>
+                Gestión Administrativa Financiera
+            </p>
+
+            <p>ISTAM</p>
+
+        </div>
+
+
+        <div>
+
+            <p>________________________________</p>
+
+            <strong>RECIBE CONFORME</strong>
+
+            <p>
+                {{ asignacion.custodio.nombres }}
+                {{ asignacion.custodio.apellidos }}
+            </p>
+
+            <p>
+                C.I. {{ asignacion.custodio.cedula }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Imprimir -->
+    <button
+        onclick="window.print()"
+        class="boton"
+    >
+        Imprimir acta
+    </button>
+
+</div>
+
+{% endblock %}

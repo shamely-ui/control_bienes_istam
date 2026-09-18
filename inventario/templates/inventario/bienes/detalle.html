@@ -1,0 +1,126 @@
+{% extends 'inventario/base.html' %}
+{% block contenido %}
+
+<h2>Detalle del bien</h2>
+
+<p>Información completa del bien seleccionado.</p>
+
+<table>
+    <tbody>
+        <tr>
+            <th>Código</th>
+            <td>
+                {% if bien.codigo %}
+                    {{ bien.codigo }}
+                {% else %}
+                    Pendiente
+                {% endif %}
+            </td>
+        </tr>
+
+        <tr>
+            <th>Bien</th>
+            <td>{{ bien.nombre }}</td>
+        </tr>
+
+        <tr>
+            <th>Tipo de bien</th>
+            <td>{{ bien.tipo_bien|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Marca</th>
+            <td>{{ bien.marca|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Modelo</th>
+            <td>{{ bien.modelo|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>N.º de serie</th>
+            <td>{{ bien.serie|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Color</th>
+            <td>{{ bien.color|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Material</th>
+            <td>{{ bien.material|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Características</th>
+            <td>{{ bien.caracteristicas|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Estado</th>
+            <td>{{ bien.estado }}</td>
+        </tr>
+
+        <tr>
+            <th>Condición original</th>
+            <td>{{ bien.condicion_original|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Valor de compra</th>
+            <td>
+                {% if bien.valor_compra_original %}
+                    {{ bien.valor_compra_original }}
+                {% elif bien.valor_compra %}
+                    $ {{ bien.valor_compra }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+
+        <tr>
+            <th>Dimensiones originales</th>
+            <td>{{ bien.dimensiones_originales|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Ubicación original</th>
+            <td>{{ bien.ubicacion_original|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Custodio original</th>
+            <td>{{ bien.custodio_original|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Procedencia</th>
+            <td>{{ bien.get_procedencia_display|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Observaciones</th>
+            <td>{{ bien.observaciones|default:"-" }}</td>
+        </tr>
+
+        <tr>
+            <th>Datos adicionales originales</th>
+            <td>{{ bien.datos_adicionales_originales|default:"-" }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+
+<a href="{% url 'editar_bien' bien.id %}" class="boton">
+    Editar
+</a>
+
+<a href="{% url 'lista_bienes' %}" class="boton">
+    Volver
+</a>
+
+{% endblock %}

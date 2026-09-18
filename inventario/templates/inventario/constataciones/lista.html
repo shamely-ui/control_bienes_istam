@@ -1,0 +1,132 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<!-- Encabezado del módulo -->
+<div class="modulo-cabecera">
+
+    <div>
+        <h2>✅ Constataciones</h2>
+        <p>Lista de constataciones realizadas a los bienes.</p>
+    </div>
+
+    <div class="modulo-acciones">
+        <a href="{% url 'nueva_constatacion' %}" class="boton">
+            + Nueva constatación
+        </a>
+    </div>
+
+</div>
+
+
+<!-- Tabla -->
+<div class="tabla-contenedor">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Bien</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Encontrado</th>
+                <th>Observaciones</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for constatacion in constataciones %}
+
+            <tr>
+
+                <!-- Bien -->
+                <td>
+                    <strong>{{ constatacion.bien.nombre }}</strong>
+
+                    <div class="texto-secundario">
+                        {% if constatacion.bien.codigo %}
+                            {{ constatacion.bien.codigo }}
+                        {% else %}
+                            Sin código
+                        {% endif %}
+                    </div>
+                </td>
+
+
+                <!-- Fecha -->
+                <td>
+                    {{ constatacion.fecha_constatacion }}
+                </td>
+
+
+                <!-- Estado encontrado -->
+                <td>
+                    {{ constatacion.estado_encontrado }}
+                </td>
+
+
+                <!-- Encontrado -->
+                <td>
+
+                    {% if constatacion.encontrado %}
+
+                        <span class="estado-activo">
+                            Sí
+                        </span>
+
+                    {% else %}
+
+                        <span class="estado-inactivo">
+                            No
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <!-- Observaciones -->
+                <td>
+                    {{ constatacion.observaciones|default:"Sin observaciones" }}
+                </td>
+
+
+                <!-- Acciones -->
+                <td>
+
+                    <div class="acciones-botones">
+
+                        <a href="{% url 'editar_constatacion' constatacion.id %}"
+                           class="btn-accion btn-editar">
+                            ✏️ Editar
+                        </a>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+                <td colspan="6" class="tabla-vacia">
+                    No hay constataciones registradas.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+
+<!-- Resumen -->
+<div class="resumen-tabla">
+    ℹ️ Mostrando {{ constataciones|length }} constatación(es) registrada(s).
+</div>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<div class="reportes-cabecera">
+    <h2>Reportes</h2>
+    <p>Seleccione el reporte que desea consultar.</p>
+</div>
+
+<div class="tarjetas-reportes">
+
+    <div class="tarjeta-reporte">
+
+        <div class="reporte-icono">📦</div>
+
+        <div class="reporte-info">
+            <h3>Bienes</h3>
+            <p>Consultar los bienes registrados.</p>
+
+            <a href="{% url 'lista_bienes' %}" class="boton">
+                Ver bienes
+            </a>
+        </div>
+
+    </div>
+
+
+    <div class="tarjeta-reporte">
+
+        <div class="reporte-icono">👥</div>
+
+        <div class="reporte-info">
+            <h3>Custodios</h3>
+            <p>Consultar los custodios registrados.</p>
+
+            <a href="{% url 'lista_custodios' %}" class="boton">
+                Ver custodios
+            </a>
+        </div>
+
+    </div>
+
+
+    <div class="tarjeta-reporte">
+
+        <div class="reporte-icono">📋</div>
+
+        <div class="reporte-info">
+            <h3>Asignaciones</h3>
+            <p>Consultar los bienes asignados.</p>
+
+            <a href="{% url 'lista_asignaciones' %}" class="boton">
+                Ver asignaciones
+            </a>
+        </div>
+
+    </div>
+
+
+    <div class="tarjeta-reporte">
+
+        <div class="reporte-icono">📁</div>
+
+        <div class="reporte-info">
+            <h3>Bajas</h3>
+            <p>Consultar los bienes dados de baja.</p>
+
+            <a href="{% url 'lista_bajas' %}" class="boton">
+                Ver bajas
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

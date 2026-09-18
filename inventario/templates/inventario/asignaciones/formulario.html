@@ -1,0 +1,321 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<style>
+
+/* Contenedor principal */
+.formulario-contenedor {
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+/* Encabezado */
+.formulario-titulo {
+    margin-bottom: 20px;
+}
+
+.formulario-titulo h2 {
+    color: #006633;
+    margin: 0 0 5px 0;
+}
+
+.formulario-titulo p {
+    color: #666;
+    margin: 0;
+}
+
+/* Tarjeta */
+.formulario-tarjeta {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
+    border-top: 4px solid #8bc34a;
+}
+
+/* Formulario en dos columnas */
+.formulario-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 25px;
+}
+
+/* Campos */
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+}
+
+.campo-formulario label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+/* Inputs, select y textarea */
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background: white;
+}
+
+/* Efecto al seleccionar */
+.campo-formulario input:focus,
+.campo-formulario select:focus,
+.campo-formulario textarea:focus {
+    outline: none;
+    border-color: #8bc34a;
+    box-shadow: 0 0 0 2px rgba(139, 195, 74, 0.15);
+}
+
+/* Observaciones ocupa todo el ancho */
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+/* Tamaño de observaciones */
+.campo-completo textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+/* Checkbox */
+.campo-activo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.campo-activo input {
+    width: auto;
+    margin: 0;
+}
+
+/* Errores */
+.error-campo {
+    color: #b00020;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Botones */
+.formulario-botones {
+    margin-top: 25px;
+    display: flex;
+    gap: 10px;
+}
+
+.boton-cancelar {
+    display: inline-block;
+    padding: 9px 18px;
+    border: 1px solid #006633;
+    border-radius: 5px;
+    color: #006633;
+    text-decoration: none;
+    background: white;
+    font-weight: bold;
+}
+
+.boton-cancelar:hover {
+    background: #f1f8e9;
+}
+
+/* Adaptación para celular */
+@media (max-width: 700px) {
+
+    .formulario-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-completo {
+        grid-column: auto;
+    }
+}
+
+</style>
+
+
+<div class="formulario-contenedor">
+
+    <!-- Título -->
+    <div class="formulario-titulo">
+
+        <h2>
+            {% if form.instance.pk %}
+                ✏️ Editar asignación
+            {% else %}
+                📋 Nueva asignación
+            {% endif %}
+        </h2>
+
+        <p>
+            Registre la entrega de un bien a un custodio.
+        </p>
+
+    </div>
+
+
+    <!-- Tarjeta del formulario -->
+    <div class="formulario-tarjeta">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <!-- Errores generales -->
+            {% if form.non_field_errors %}
+                <div class="error-campo">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+
+            <div class="formulario-grid">
+
+                <!-- Bien -->
+                <div class="campo-formulario">
+
+                    <label for="{{ form.bien.id_for_label }}">
+                        Bien
+                    </label>
+
+                    {{ form.bien }}
+
+                    <div class="error-campo">
+                        {{ form.bien.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Custodio -->
+                <div class="campo-formulario">
+
+                    <label for="{{ form.custodio.id_for_label }}">
+                        Custodio
+                    </label>
+
+                    {{ form.custodio }}
+
+                    <div class="error-campo">
+                        {{ form.custodio.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Número de acta -->
+                <div class="campo-formulario">
+
+                    <label for="{{ form.numero_acta.id_for_label }}">
+                        Número de acta
+                    </label>
+
+                    {{ form.numero_acta }}
+
+                    <div class="error-campo">
+                        {{ form.numero_acta.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Fecha de asignación -->
+                <div class="campo-formulario">
+
+                    <label for="{{ form.fecha_asignacion.id_for_label }}">
+                        Fecha de asignación
+                    </label>
+
+                    {{ form.fecha_asignacion }}
+
+                    <div class="error-campo">
+                        {{ form.fecha_asignacion.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Fecha de devolución -->
+                <div class="campo-formulario">
+
+                    <label for="{{ form.fecha_devolucion.id_for_label }}">
+                        Fecha de devolución
+                    </label>
+
+                    {{ form.fecha_devolucion }}
+
+                    <div class="error-campo">
+                        {{ form.fecha_devolucion.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Observaciones -->
+                <div class="campo-formulario campo-completo">
+
+                    <label for="{{ form.observaciones.id_for_label }}">
+                        Observaciones
+                    </label>
+
+                    {{ form.observaciones }}
+
+                    <div class="error-campo">
+                        {{ form.observaciones.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Activa -->
+                <div class="campo-completo">
+
+                    <div class="campo-activo">
+
+                        {{ form.activo }}
+
+                        <label for="{{ form.activo.id_for_label }}">
+                            Asignación activa
+                        </label>
+
+                    </div>
+
+                    <div class="error-campo">
+                        {{ form.activo.errors }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Botones -->
+            <div class="formulario-botones">
+
+                <button type="submit" class="boton">
+                    💾 Guardar
+                </button>
+
+                <a href="{% url 'lista_asignaciones' %}"
+                   class="boton-cancelar">
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<div class="contenedor-formulario">
+
+    <h2>📄 Importar matriz de entrega de actas</h2>
+
+    <p>
+        Seleccione el archivo Excel proporcionado por el ISTAM.
+    </p>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="campo-formulario">
+            <label><strong>Archivo Excel:</strong></label>
+
+            <input
+                type="file"
+                name="archivo"
+                accept=".xlsx"
+                required
+            >
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn-guardar">
+            Importar matriz
+        </button>
+
+        <a href="{% url 'lista_asignaciones' %}" class="btn-cancelar">
+            Cancelar
+        </a>
+
+    </form>
+
+    {% if mensaje %}
+        <p>{{ mensaje }}</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

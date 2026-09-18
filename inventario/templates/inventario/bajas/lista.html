@@ -1,0 +1,92 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<!-- Encabezado del módulo -->
+<div class="modulo-cabecera">
+
+    <div>
+        <h2>📁 Bajas</h2>
+        <p>Lista de bienes dados de baja.</p>
+    </div>
+
+    <div class="modulo-acciones">
+        <a href="{% url 'nueva_baja' %}" class="boton">
+            + Nueva baja
+        </a>
+    </div>
+
+</div>
+
+
+<!-- Tabla -->
+<div class="tabla-contenedor">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Bien</th>
+                <th>Fecha</th>
+                <th>Motivo</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for baja in bajas %}
+
+            <tr>
+
+                <!-- Bien -->
+                <td>
+                    <strong>{{ baja.bien.nombre }}</strong>
+
+                    <div class="texto-secundario">
+                        {% if baja.bien.codigo %}
+                            {{ baja.bien.codigo }}
+                        {% else %}
+                            Sin código
+                        {% endif %}
+                    </div>
+                </td>
+
+                <!-- Fecha -->
+                <td>
+                    {{ baja.fecha_baja }}
+                </td>
+
+                <!-- Motivo -->
+                <td>
+                    {{ baja.motivo }}
+                </td>
+
+                <!-- Observaciones -->
+                <td>
+                    {{ baja.observaciones|default:"Sin observaciones" }}
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+                <td colspan="4" class="tabla-vacia">
+                    No hay bajas registradas.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+
+<!-- Resumen -->
+<div class="resumen-tabla">
+    ℹ️ Mostrando {{ bajas|length }} baja(s) registrada(s).
+</div>
+
+{% endblock %}

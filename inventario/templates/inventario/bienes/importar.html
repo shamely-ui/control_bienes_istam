@@ -1,0 +1,46 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<h2>Importar bienes desde Excel</h2>
+
+<p>
+    Seleccione el archivo Excel que contiene los bienes que desea registrar.
+</p>
+
+{% if mensaje %}
+    <div class="mensaje-importacion">
+        {{ mensaje }}
+    </div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Archivo Excel -->
+    <div>
+      
+        {{ form.archivo }}
+    </div>
+
+    <br>
+
+    <!-- Procedencia -->
+    <div>
+        {{ form.procedencia.label_tag }}
+        <br><br>
+        {{ form.procedencia }}
+    </div>
+
+    <br>
+
+    <button type="submit" class="boton">
+        Importar bienes
+    </button>
+
+    <a href="{% url 'lista_bienes' %}" class="boton">
+        Volver
+    </a>
+</form>
+
+{% endblock %}

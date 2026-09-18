@@ -1,0 +1,291 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<style>
+
+/* Contenedor principal */
+.formulario-contenedor {
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+/* Encabezado */
+.formulario-titulo {
+    margin-bottom: 20px;
+}
+
+.formulario-titulo h2 {
+    color: #006633;
+    margin: 0 0 5px 0;
+}
+
+.formulario-titulo p {
+    color: #666;
+    margin: 0;
+}
+
+/* Tarjeta */
+.formulario-tarjeta {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
+    border-top: 4px solid #8bc34a;
+}
+
+/* Dos columnas */
+.formulario-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 25px;
+}
+
+/* Campos */
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+}
+
+.campo-formulario label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+/* Inputs */
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background: white;
+}
+
+/* Efecto al seleccionar */
+.campo-formulario input:focus,
+.campo-formulario select:focus,
+.campo-formulario textarea:focus {
+    outline: none;
+    border-color: #8bc34a;
+    box-shadow: 0 0 0 2px rgba(139, 195, 74, 0.15);
+}
+
+/* Campo que ocupa todo el ancho */
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+/* Observaciones */
+.campo-completo textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+/* Checkbox encontrado */
+.campo-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.campo-check input {
+    width: auto;
+    margin: 0;
+}
+
+/* Errores */
+.error-campo {
+    color: #b00020;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Botones */
+.formulario-botones {
+    margin-top: 25px;
+    display: flex;
+    gap: 10px;
+}
+
+.boton-cancelar {
+    display: inline-block;
+    padding: 9px 18px;
+    border: 1px solid #006633;
+    border-radius: 5px;
+    color: #006633;
+    text-decoration: none;
+    background: white;
+    font-weight: bold;
+}
+
+.boton-cancelar:hover {
+    background: #f1f8e9;
+}
+
+/* Adaptación para celular */
+@media (max-width: 700px) {
+
+    .formulario-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-completo {
+        grid-column: auto;
+    }
+}
+
+</style>
+
+
+<div class="formulario-contenedor">
+
+    <!-- Encabezado -->
+    <div class="formulario-titulo">
+
+        <h2>
+            {% if form.instance.pk %}
+                ✏️ Editar constatación
+            {% else %}
+                ✅ Nueva constatación
+            {% endif %}
+        </h2>
+
+        <p>
+            Registre la verificación física del bien institucional.
+        </p>
+
+    </div>
+
+
+    <!-- Tarjeta -->
+    <div class="formulario-tarjeta">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <!-- Errores generales -->
+            {% if form.non_field_errors %}
+
+                <div class="error-campo">
+                    {{ form.non_field_errors }}
+                </div>
+
+            {% endif %}
+
+
+            <div class="formulario-grid">
+
+                <!-- Bien -->
+                <div class="campo-formulario campo-completo">
+
+                    <label for="{{ form.bien.id_for_label }}">
+                        Bien
+                    </label>
+
+                    {{ form.bien }}
+
+                    <div class="error-campo">
+                        {{ form.bien.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Fecha -->
+                <div class="campo-formulario">
+
+                    <label for="{{ form.fecha_constatacion.id_for_label }}">
+                        Fecha de constatación
+                    </label>
+
+                    {{ form.fecha_constatacion }}
+
+                    <div class="error-campo">
+                        {{ form.fecha_constatacion.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Estado encontrado -->
+                <div class="campo-formulario">
+
+                    <label for="{{ form.estado_encontrado.id_for_label }}">
+                        Estado encontrado
+                    </label>
+
+                    {{ form.estado_encontrado }}
+
+                    <div class="error-campo">
+                        {{ form.estado_encontrado.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Encontrado -->
+                <div class="campo-completo">
+
+                    <div class="campo-check">
+
+                        {{ form.encontrado }}
+
+                        <label for="{{ form.encontrado.id_for_label }}">
+                            Bien encontrado
+                        </label>
+
+                    </div>
+
+                    <div class="error-campo">
+                        {{ form.encontrado.errors }}
+                    </div>
+
+                </div>
+
+
+                <!-- Observaciones -->
+                <div class="campo-formulario campo-completo">
+
+                    <label for="{{ form.observaciones.id_for_label }}">
+                        Observaciones
+                    </label>
+
+                    {{ form.observaciones }}
+
+                    <div class="error-campo">
+                        {{ form.observaciones.errors }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Botones -->
+            <div class="formulario-botones">
+
+                <button type="submit" class="boton">
+                    💾 Guardar
+                </button>
+
+                <a href="{% url 'lista_constataciones' %}"
+                   class="boton-cancelar">
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
