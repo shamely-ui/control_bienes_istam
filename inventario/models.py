@@ -1,11 +1,14 @@
 # Importamos las herramientas para crear tablas en la base de datos
 from django.db import models
+
 # Permite mostrar mensajes de error cuando un dato no es válido
 from django.core.exceptions import ValidationError
+
 
 # ==========================
 # VALIDACIÓN DE CÉDULA ECUATORIANA
 # ==========================
+
 # Comprueba que la cédula ingresada tenga una estructura válida
 def validar_cedula_ecuatoriana(cedula):
 
@@ -58,118 +61,122 @@ def validar_cedula_ecuatoriana(cedula):
             'La cédula ecuatoriana ingresada no es válida.'
         )
 
+
 # ==========================
 # TABLA: CATEGORÍAS
 # ==========================
-# Aquí se almacenarán los tipos de bienes del instituto
-# Ejemplo: Computadoras, Mobiliario, Impresoras, etc.
+
 class Categoria(models.Model):
 
-    # Nombre de la categoría (máximo 100 caracteres)
+    # Nombre de la categoría
     nombre = models.CharField(max_length=100)
 
-    # Descripción opcional de la categoría
-    descripcion = models.TextField(blank=True, null=True)
+    # Descripción opcional
+    descripcion = models.TextField(
+        blank=True,
+        null=True
+    )
 
-    # Estado para activar o desactivar categorías
+    # Permite activar o desactivar
     activo = models.BooleanField(default=True)
 
-    # Fecha en la que fue creada
+    # Fecha de creación
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
-    # Muestra el nombre cuando la categoría aparezca en Django
     def __str__(self):
         return self.nombre
+
 
 # ==========================
 # TABLA: UBICACIONES
 # ==========================
-# Guarda los lugares físicos donde pueden encontrarse los bienes del instituto
+
 class Ubicacion(models.Model):
 
     # Nombre de la ubicación
-    # Ejemplo: Rectorado, Biblioteca, Laboratorio de Software
     nombre = models.CharField(max_length=150)
 
-    # Descripción adicional de la ubicación
-    # Este campo es opcional
-    descripcion = models.TextField(blank=True, null=True)
+    # Descripción opcional
+    descripcion = models.TextField(
+        blank=True,
+        null=True
+    )
 
-    # Permite activar o desactivar una ubicación sin eliminarla
+    # Permite activar o desactivar
     activo = models.BooleanField(default=True)
 
-    # Guarda automáticamente la fecha en que se registró la ubicación
+    # Fecha de creación
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
-    # Permite que Django muestre el nombre de la ubicación
     def __str__(self):
         return self.nombre
+
 
 # ==========================
 # TABLA: CUSTODIOS
 # ==========================
-# Guarda la información de las personas responsables de los bienes
+
 class Custodio(models.Model):
 
-    # Número de cédula del custodio
-    # unique=True evita que se registre la misma cédula dos veces
-    cedula = models.CharField(max_length=10,
-     unique=True,
-     validators=[validar_cedula_ecuatoriana]
-     )
+    # Número de cédula
+    cedula = models.CharField(
+        max_length=10,
+        unique=True,
+        validators=[validar_cedula_ecuatoriana]
+    )
 
-    # Nombres del custodio
+    # Nombres
     nombres = models.CharField(max_length=100)
 
-    # Apellidos del custodio
+    # Apellidos
     apellidos = models.CharField(max_length=100)
 
-    # Cargo que ocupa dentro del instituto
-    # Ejemplo: Docente, Secretaria, Coordinador
+    # Cargo
     cargo = models.CharField(max_length=100)
 
-    # Departamento o área a la que pertenece
-    # Ejemplo: Rectorado, Secretaría, Sistemas
+    # Departamento o área
     departamento = models.CharField(max_length=100)
 
     # Correo electrónico
-    # Puede dejarse vacío si no se dispone del dato
-    correo = models.EmailField(blank=True, null=True)
+    correo = models.EmailField(
+        blank=True,
+        null=True
+    )
 
-    # Número de teléfono
-    # Puede dejarse vacío
-    telefono = models.CharField(max_length=15, blank=True, null=True)
+    # Teléfono
+    telefono = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True
+    )
 
     # Ciclo del estudiante
     ciclo = models.CharField(
         max_length=50,
         blank=True,
         null=True
-)
+    )
 
     # Carrera del estudiante
     carrera = models.CharField(
         max_length=150,
         blank=True,
         null=True
-)
+    )
 
-    # Dirección del estudiante
+    # Dirección
     direccion = models.CharField(
-     max_length=200,
-     blank=True,
-     null=True
-)
+        max_length=200,
+        blank=True,
+        null=True
+    )
 
-
-
-    # Permite activar o desactivar al custodio sin eliminarlo
+    # Permite activar o desactivar
     activo = models.BooleanField(default=True)
 
-    # Fecha en la que se registró el custodio
+    # Fecha de creación
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
-    # Muestra nombres y apellidos cuando Django utilice este registro
     def __str__(self):
         return f"{self.nombres} {self.apellidos}"
 
@@ -177,9 +184,10 @@ class Custodio(models.Model):
 # ==========================
 # TABLA: BIENES
 # ==========================
-# Guarda la información de cada bien que pertenece al instituto
+
 class Bien(models.Model):
-# Código institucional, puede quedar pendiente
+
+    # Código institucional
     codigo = models.CharField(
         max_length=50,
         unique=True,
@@ -342,39 +350,54 @@ class Bien(models.Model):
     PROCEDENCIAS = [
         ('COMPRADO', 'Comprado'),
         ('DONADO', 'Donado'),
-]
+    ]
 
     procedencia = models.CharField(
         max_length=20,
         choices=PROCEDENCIAS,
         blank=True,
         null=True
-)
-
+    )
 
     # Indica si sigue activo
     activo = models.BooleanField(default=True)
 
-    # Fecha de creación
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    # Fotografía opcional del bien
+    foto = models.ImageField(
+        upload_to='bienes/',
+        blank=True,
+        null=True
+    )
 
-    def __str__(self):
-        return f"{self.codigo} - {self.nombre}"
+# Fecha de creación
+fecha_creacion = models.DateTimeField(auto_now_add=True)
+
 
 # ==========================
 # TABLA: ASIGNACIONES
 # ==========================
-# Registra la entrega de un bien a un custodio
+
+# Permite entregar uno o varios bienes a un custodio
 class Asignacion(models.Model):
 
-    # Bien que se entrega
+    # Campo antiguo
+    # Se conserva temporalmente para mantener los registros anteriores
     bien = models.ForeignKey(
         Bien,
         on_delete=models.PROTECT,
-        related_name='asignaciones'
+        related_name='asignaciones',
+        blank=True,
+        null=True
     )
 
-    # Persona responsable del bien
+    # Permite incluir varios bienes en una misma asignación
+    bienes = models.ManyToManyField(
+        Bien,
+        related_name='asignaciones_multiples',
+        blank=True
+    )
+
+    # Persona responsable de los bienes
     custodio = models.ForeignKey(
         Custodio,
         on_delete=models.PROTECT,
@@ -389,18 +412,25 @@ class Asignacion(models.Model):
         null=True
     )
 
-   # Fecha de entrega
-# Puede quedar pendiente si el documento no contiene la fecha
+    # Fecha de entrega
     fecha_asignacion = models.DateField(
+        blank=True,
+        null=True
+    )
+
+   # Fecha prevista para devolver los bienes
+    fecha_prevista_devolucion = models.DateField(
+        'Fecha prevista de devolución',
         blank=True,
         null=True
 )
 
-    # Fecha de devolución, si existe
+# Fecha en que los bienes fueron devueltos realmente
     fecha_devolucion = models.DateField(
+        'Fecha de devolución real',
         blank=True,
         null=True
-    )
+)
 
     # Observaciones opcionales
     observaciones = models.TextField(
@@ -414,12 +444,14 @@ class Asignacion(models.Model):
     # Fecha de registro
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
-    # Texto que mostrará Django
     def __str__(self):
-        return f"{self.bien.codigo} - {self.custodio}"
+        return f"Asignación {self.id} - {self.custodio}"
+
+
 # ==========================
 # TABLA: CONSTATACIONES
 # ==========================
+
 class Constatacion(models.Model):
 
     # Bien revisado
@@ -429,7 +461,7 @@ class Constatacion(models.Model):
         related_name='constataciones'
     )
 
-    # Fecha de la revisión
+    # Fecha de revisión
     fecha_constatacion = models.DateField()
 
     # Estado encontrado
@@ -451,12 +483,13 @@ class Constatacion(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.bien.codigo} - {self.fecha_constatacion}"  
+        return f"{self.bien.codigo} - {self.fecha_constatacion}"
 
 
 # ==========================
 # TABLA: BAJAS
 # ==========================
+
 class Baja(models.Model):
 
     # Bien dado de baja
@@ -469,7 +502,7 @@ class Baja(models.Model):
     # Motivo de la baja
     motivo = models.CharField(max_length=200)
 
-    # Fecha de la baja
+    # Fecha de baja
     fecha_baja = models.DateField()
 
     # Observaciones

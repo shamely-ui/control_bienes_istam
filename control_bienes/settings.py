@@ -137,12 +137,17 @@ STATIC_URL = 'static/'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+# Email para recuperación de contraseña
+# Durante las pruebas, el correo se muestra en la terminal
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DEFAULT_FROM_EMAIL = 'sistema@istam.edu.ec'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Página de inicio de sesión
 LOGIN_URL = '/login/'
+
+# Archivos multimedia subidos por los usuarios
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

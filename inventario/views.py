@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from openpyxl import load_workbook
 from django.db.models import Q
 from django.db import transaction
+from django.core.paginator import Paginator
 
 from django.utils import timezone
 
@@ -19,23 +20,31 @@ from .forms import CategoriaForm, UbicacionForm, CustodioForm, BienForm, Asignac
 @login_required
 def dashboard(request):
 
+    # Total de bienes registrados
     total_bienes = Bien.objects.count()
 
-    # Bienes que están actualmente asignados
-    bienes_asignados = Asignacion.objects.filter(
-        fecha_devolucion__isnull=True
-    ).values('bien').distinct().count()
+    # IDs de los bienes que están actualmente asignados
+    bienes_ocupados = Asignacion.objects.filter(
+        fecha_devolucion__isnull=True,
+        bienes__isnull=False
+    ).values_list(
+        'bienes__id',
+        flat=True
+    ).distinct()
+
+    # Cantidad real de bienes asignados
+    bienes_asignados = Bien.objects.filter(
+        id__in=bienes_ocupados
+    ).count()
 
     # Bienes activos que no están asignados
     disponibles = Bien.objects.filter(
         activo=True
     ).exclude(
-        id__in=Asignacion.objects.filter(
-            fecha_devolucion__isnull=True
-        ).values('bien_id')
+        id__in=bienes_ocupados
     ).count()
 
-    # Bienes que han sido dados de baja
+    # Bienes dados de baja
     dados_baja = Baja.objects.values(
         'bien'
     ).distinct().count()
@@ -52,7 +61,6 @@ def dashboard(request):
         'inventario/dashboard.html',
         contexto
     )
-
 # Muestra la lista de categorías
 @login_required
 def lista_categorias(request):
@@ -249,13 +257,16 @@ def cambiar_estado_custodio(request, id):
 # Muestra la lista de bienes registrados
 @login_required
 def lista_bienes(request):
-    bienes = Bien.objects.all()
 
-    # Texto escrito en el buscador
+    # Todos los bienes
+    bienes_queryset = Bien.objects.all().order_by('id')
+
+    # Texto del buscador
     buscar = request.GET.get('buscar', '').strip()
 
+    # Aplica búsqueda
     if buscar:
-        bienes = bienes.filter(
+        bienes_queryset = bienes_queryset.filter(
             Q(codigo__icontains=buscar) |
             Q(nombre__icontains=buscar) |
             Q(marca__icontains=buscar) |
@@ -263,12 +274,21 @@ def lista_bienes(request):
             Q(serie__icontains=buscar)
         )
 
+    # Todos los bienes para imprimir
+    bienes_reporte = bienes_queryset
+
+    # Solo 20 bienes por página para la pantalla
+    paginador = Paginator(bienes_queryset, 20)
+    numero_pagina = request.GET.get('page')
+    bienes_pagina = paginador.get_page(numero_pagina)
+
     return render(
         request,
         'inventario/bienes/lista.html',
         {
-            'bienes': bienes,
-            'buscar': buscar
+            'bienes': bienes_pagina,
+            'bienes_reporte': bienes_reporte,
+            'buscar': buscar,
         }
     )
 # Muestra toda la información de un bien
@@ -289,7 +309,12 @@ def detalle_bien(request, id):
 def nuevo_bien(request):
 
     if request.method == 'POST':
-        form = BienForm(request.POST)
+
+        # request.FILES permite guardar la fotografía
+        form = BienForm(
+            request.POST,
+            request.FILES
+        )
 
         if form.is_valid():
             form.save()
@@ -303,25 +328,35 @@ def nuevo_bien(request):
         'inventario/bienes/formulario.html',
         {'form': form}
     )
-
 # Edita un bien registrado
 @login_required
 def editar_bien(request, id):
-    bien = Bien.objects.get(id=id)
+
+    bien = get_object_or_404(Bien, id=id)
 
     if request.method == 'POST':
-        form = BienForm(request.POST, instance=bien)
+
+        # Permite cambiar o conservar la fotografía
+        form = BienForm(
+            request.POST,
+            request.FILES,
+            instance=bien
+        )
 
         if form.is_valid():
             form.save()
             return redirect('lista_bienes')
+
     else:
         form = BienForm(instance=bien)
 
     return render(
         request,
         'inventario/bienes/formulario.html',
-        {'form': form}
+        {
+            'form': form,
+            'bien': bien
+        }
     )
 
 # Activa o desactiva un bien
@@ -334,10 +369,10 @@ def cambiar_estado_bien(request, id):
 
     return redirect('lista_bienes')
 
+# Muestra la lista de asignaciones
 @login_required
 def lista_asignaciones(request):
 
-    # Obtiene todas las asignaciones
     asignaciones = Asignacion.objects.all()
 
     # Texto buscado
@@ -346,23 +381,23 @@ def lista_asignaciones(request):
     # Estado seleccionado
     estado = request.GET.get('estado', '').strip()
 
-    # Buscar por bien o custodio
+    # Busca dentro de todos los bienes de la asignación
     if buscar:
         asignaciones = asignaciones.filter(
-            Q(bien__nombre__icontains=buscar) |
-            Q(bien__codigo__icontains=buscar) |
+            Q(bienes__nombre__icontains=buscar) |
+            Q(bienes__codigo__icontains=buscar) |
             Q(custodio__nombres__icontains=buscar) |
             Q(custodio__apellidos__icontains=buscar) |
             Q(numero_acta__icontains=buscar)
-        )
+        ).distinct()
 
-    # Filtrar pendientes
+    # Asignaciones pendientes
     if estado == 'pendiente':
         asignaciones = asignaciones.filter(
             fecha_devolucion__isnull=True
         )
 
-    # Filtrar devueltos
+    # Asignaciones devueltas
     elif estado == 'devuelto':
         asignaciones = asignaciones.filter(
             fecha_devolucion__isnull=False
@@ -382,40 +417,144 @@ def lista_asignaciones(request):
 @login_required
 def nueva_asignacion(request):
 
+   # Bienes que están en asignaciones todavía no devueltas
+    bienes_ocupados = Asignacion.objects.filter(
+        fecha_devolucion__isnull=True,
+        bienes__isnull=False
+    ).values_list(
+        'bienes__id',
+        flat=True
+    ).distinct()
+
+    bienes_disponibles = Bien.objects.filter(
+        activo=True
+    ).exclude(
+        id__in=bienes_ocupados
+    )
+
     if request.method == 'POST':
+
         form = AsignacionForm(request.POST)
 
-        if form.is_valid():
-            form.save()
-            return redirect('lista_asignaciones')
+        # Recibe los bienes seleccionados
+        bienes_ids = request.POST.getlist('bienes_seleccionados')
+        
+        if form.is_valid() and bienes_ids:
+
+            # Comprueba que los bienes sigan disponibles
+            bienes = Bien.objects.filter(
+                id__in=bienes_ids,
+                activo=True
+            ).exclude(
+                id__in=bienes_ocupados
+            )
+
+            # Todos los seleccionados deben estar disponibles
+            if bienes.count() == len(set(bienes_ids)):
+
+                asignacion = form.save()
+
+                # Guarda todos los bienes seleccionados
+                asignacion.bienes.set(bienes)
+
+                return redirect('lista_asignaciones')
+
+        else:
+            bienes_ids = []
 
     else:
         form = AsignacionForm()
+        bienes_ids = []
 
     return render(
         request,
         'inventario/asignaciones/formulario.html',
-        {'form': form}
+        {
+            'form': form,
+            'bienes_disponibles': bienes_disponibles,
+            'bienes_ids': bienes_ids
+        }
     )
 
 # Edita una asignación
 @login_required
 def editar_asignacion(request, id):
-    asignacion = Asignacion.objects.get(id=id)
+
+    asignacion = get_object_or_404(Asignacion, id=id)
+
+    # Bienes que ya pertenecen a esta asignación
+    bienes_actuales = asignacion.bienes.all()
+
+    # Compatibilidad con asignaciones antiguas
+    if not bienes_actuales.exists() and asignacion.bien:
+        bienes_actuales = Bien.objects.filter(
+            id=asignacion.bien.id
+        )
+
+    # Bienes ocupados por otras asignaciones pendientes
+    bienes_ocupados = Asignacion.objects.filter(
+        fecha_devolucion__isnull=True,
+        bienes__isnull=False
+    ).exclude(
+        id=asignacion.id
+    ).values_list(
+        'bienes__id',
+        flat=True
+    ).distinct()
+
+    # Bienes disponibles para agregar
+    bienes_disponibles = Bien.objects.filter(
+        activo=True
+    ).exclude(
+        id__in=bienes_ocupados
+    ).exclude(
+        id__in=bienes_actuales.values_list('id', flat=True)
+    )
 
     if request.method == 'POST':
-        form = AsignacionForm(request.POST, instance=asignacion)
 
-        if form.is_valid():
-            form.save()
-            return redirect('lista_asignaciones')
+        form = AsignacionForm(
+            request.POST,
+            instance=asignacion
+        )
+
+        # Bienes seleccionados en el formulario
+        bienes_ids = request.POST.getlist(
+            'bienes_seleccionados'
+        )
+
+        if form.is_valid() and bienes_ids:
+
+            # Comprueba que no estén ocupados por otra asignación
+            bienes = Bien.objects.filter(
+                id__in=bienes_ids,
+                activo=True
+            ).exclude(
+                id__in=bienes_ocupados
+            )
+
+            if bienes.count() == len(set(bienes_ids)):
+
+                asignacion = form.save()
+
+                # Actualiza todos los bienes
+                asignacion.bienes.set(bienes)
+
+                return redirect('lista_asignaciones')
+
     else:
-        form = AsignacionForm(instance=asignacion)
+        form = AsignacionForm(
+            instance=asignacion
+        )
 
     return render(
         request,
         'inventario/asignaciones/formulario.html',
-        {'form': form}
+        {
+            'form': form,
+            'bienes_disponibles': bienes_disponibles,
+            'bienes_actuales': bienes_actuales,
+        }
     )
 # Registra la devolución de un bien
 @login_required
@@ -438,6 +577,20 @@ def acta_asignacion(request, id):
         'inventario/asignaciones/acta.html',
         {'asignacion': asignacion}
     )
+
+# Elimina una asignación
+@login_required
+def eliminar_asignacion(request, id):
+
+    # Busca la asignación
+    asignacion = get_object_or_404(Asignacion, id=id)
+
+    # Solo elimina si se envía desde el botón Eliminar
+    if request.method == 'POST':
+        asignacion.delete()
+
+    # Regresa a la lista de asignaciones
+    return redirect('lista_asignaciones')
 
 # Muestra la lista de constataciones
 @login_required
@@ -1121,11 +1274,8 @@ def importar_matriz_actas(request):
                             activo=True
                         )
 
-                        # -------------------------
-                        # CREA LA ASIGNACIÓN
-                        # -------------------------
-
-                        Asignacion.objects.create(
+                       # Crea la asignación
+                        asignacion = Asignacion.objects.create(
                             bien=bien,
                             custodio=custodio,
                             numero_acta=numero_acta,
@@ -1133,6 +1283,9 @@ def importar_matriz_actas(request):
                             observaciones=observacion,
                             activa=True
                         )
+
+                        # Relaciona el bien con la nueva asignación múltiple
+                        asignacion.bienes.add(bien)
 
                         creados += 1
 

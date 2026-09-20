@@ -4,44 +4,129 @@
 
 <style>
 
-/* El reporte no se muestra normalmente */
+/* ============================= */
+/* VISTA NORMAL */
+/* ============================= */
+
 .reporte-impresion {
     display: none;
 }
 
-/* Encabezado del reporte */
+.imagen-bien {
+    width: 65px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.sin-foto {
+    width: 65px;
+    height: 55px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #f3f3f3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    font-size: 9px;
+    text-align: center;
+}
+
+.sin-foto-icono {
+    font-size: 20px;
+}
+
+
+/* ============================= */
+/* PAGINACIÓN */
+/* ============================= */
+
+.paginacion {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.paginacion a {
+    padding: 7px 12px;
+    border: 1px solid #006633;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #006633;
+    background: white;
+    font-weight: bold;
+}
+
+.paginacion a:hover {
+    background: #006633;
+    color: white;
+}
+
+.pagina-actual {
+    padding: 7px 12px;
+    background: #006633;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.total-registros {
+    margin-top: 10px;
+    text-align: right;
+    color: #666;
+    font-size: 13px;
+}
+
+
+/* ============================= */
+/* REPORTE */
+/* ============================= */
+
 .encabezado-reporte {
     position: relative;
-    min-height: 95px;
+    min-height: 90px;
     margin-bottom: 10px;
 }
 
-/* Logo más grande y hacia la esquina izquierda */
 .logo-reporte {
     position: absolute;
     left: 0;
     top: 0;
-    width: 95px;
+    width: 85px;
     height: auto;
 }
 
-/* Texto centrado del encabezado */
 .texto-reporte {
-    width: 100%;
     text-align: center;
-    padding-top: 5px;
+    width: 100%;
 }
 
 .texto-reporte h2 {
     margin: 0;
+    font-size: 18px;
 }
 
 .texto-reporte p {
-    margin: 2px 0;
+    margin: 3px 0;
 }
 
-/* Configuración para imprimir */
+
+/* ============================= */
+/* IMPRESIÓN */
+/* ============================= */
+
 @media print {
+
+    @page {
+        size: A4 landscape;
+        margin: 12mm;
+    }
 
     header,
     nav,
@@ -55,31 +140,40 @@
         display: block !important;
     }
 
+    .encabezado-reporte {
+        min-height: 80px;
+    }
+
     .reporte-impresion table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 12px;
-        font-size: 11px;
+        font-size: 9px;
+        margin-top: 10px;
+    }
+
+    .reporte-impresion thead {
+        display: table-header-group;
+    }
+
+    .reporte-impresion tr {
+        page-break-inside: avoid;
     }
 
     .reporte-impresion th,
     .reporte-impresion td {
         border: 1px solid #333;
-        padding: 6px;
+        padding: 4px;
         text-align: left;
     }
 
     .reporte-impresion th {
         background: #eeeeee !important;
         color: black !important;
+        font-weight: bold;
     }
 
     .logo-reporte {
-        width: 95px;
-    }
-
-    .texto-reporte {
-        text-align: center;
+        width: 80px;
     }
 
 }
@@ -87,19 +181,29 @@
 </style>
 
 
-<!-- Vista normal del sistema -->
+<!-- ================================= -->
+<!-- VISTA NORMAL -->
+<!-- ================================= -->
+
 <div class="vista-pantalla">
 
     <div class="modulo-cabecera">
 
         <div>
+
             <h2>📦 Bienes</h2>
-            <p>Lista de bienes registrados en el sistema.</p>
+
+            <p>
+                Lista de bienes registrados en el sistema.
+            </p>
+
         </div>
+
 
         <div class="modulo-acciones">
 
-            <a href="{% url 'nuevo_bien' %}" class="boton">
+            <a href="{% url 'nuevo_bien' %}"
+               class="boton">
                 + Nuevo bien
             </a>
 
@@ -119,7 +223,7 @@
     </div>
 
 
-    <!-- Opciones auxiliares -->
+    <!-- Opciones -->
     <div class="opciones-bienes">
 
         <a href="{% url 'lista_categorias' %}"
@@ -136,7 +240,8 @@
 
 
     <!-- Buscador -->
-    <form method="get" class="buscador-modulo">
+    <form method="get"
+          class="buscador-modulo">
 
         <div class="buscador-campo">
 
@@ -151,9 +256,12 @@
 
         </div>
 
-        <button type="submit" class="boton">
+
+        <button type="submit"
+                class="boton">
             Buscar
         </button>
+
 
         {% if buscar %}
 
@@ -167,7 +275,7 @@
     </form>
 
 
-    <!-- Tabla normal -->
+    <!-- Tabla de pantalla -->
     <div class="tabla-contenedor">
 
         <table>
@@ -175,6 +283,7 @@
             <thead>
 
                 <tr>
+                    <th>Imagen</th>
                     <th>Código</th>
                     <th>Bien</th>
                     <th>Marca</th>
@@ -186,12 +295,42 @@
 
             </thead>
 
+
             <tbody>
 
                 {% for bien in bienes %}
 
                 <tr>
 
+                    <!-- Imagen -->
+                    <td>
+
+                        {% if bien.foto %}
+
+                            <img
+                                src="{{ bien.foto.url }}"
+                                alt="{{ bien.nombre }}"
+                                class="imagen-bien"
+                            >
+
+                        {% else %}
+
+                            <div class="sin-foto">
+
+                                <span class="sin-foto-icono">
+                                    🖼️
+                                </span>
+
+                                Sin foto
+
+                            </div>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- Código -->
                     <td>
 
                         {% if bien.codigo %}
@@ -202,7 +341,10 @@
 
                     </td>
 
-                    <td>{{ bien.nombre }}</td>
+
+                    <td>
+                        {{ bien.nombre }}
+                    </td>
 
                     <td>
                         {{ bien.marca|default:"-" }}
@@ -220,22 +362,33 @@
                         {{ bien.estado }}
                     </td>
 
+
+                    <!-- Acciones -->
                     <td>
 
                         <div class="acciones-botones">
 
-                            <a href="{% url 'detalle_bien' bien.id %}"
-                               class="btn-accion btn-detalle">
+                            <a
+                                href="{% url 'detalle_bien' bien.id %}"
+                                class="btn-accion btn-detalle">
+
                                 Ver detalles
+
                             </a>
 
-                            <a href="{% url 'editar_bien' bien.id %}"
-                               class="btn-accion btn-editar">
+
+                            <a
+                                href="{% url 'editar_bien' bien.id %}"
+                                class="btn-accion btn-editar">
+
                                 Editar
+
                             </a>
 
-                            <a href="{% url 'cambiar_estado_bien' bien.id %}"
-                               class="btn-accion btn-estado">
+
+                            <a
+                                href="{% url 'cambiar_estado_bien' bien.id %}"
+                                class="btn-accion btn-estado">
 
                                 {% if bien.activo %}
                                     Desactivar
@@ -251,12 +404,18 @@
 
                 </tr>
 
+
                 {% empty %}
 
                 <tr>
-                    <td colspan="7">
+
+                    <td colspan="8"
+                        style="text-align:center;">
+
                         No hay bienes registrados.
+
                     </td>
+
                 </tr>
 
                 {% endfor %}
@@ -267,13 +426,75 @@
 
     </div>
 
+
+    <!-- Total -->
+    <div class="total-registros">
+
+        Total de bienes:
+
+        <strong>
+            {{ bienes.paginator.count }}
+        </strong>
+
+    </div>
+
+
+    <!-- Paginación -->
+    {% if bienes.has_other_pages %}
+
+    <div class="paginacion">
+
+
+        {% if bienes.has_previous %}
+
+            <a href="?page=1{% if buscar %}&buscar={{ buscar|urlencode }}{% endif %}">
+                « Primera
+            </a>
+
+            <a href="?page={{ bienes.previous_page_number }}{% if buscar %}&buscar={{ buscar|urlencode }}{% endif %}">
+                ‹ Anterior
+            </a>
+
+        {% endif %}
+
+
+        <span class="pagina-actual">
+
+            Página {{ bienes.number }}
+            de {{ bienes.paginator.num_pages }}
+
+        </span>
+
+
+        {% if bienes.has_next %}
+
+            <a href="?page={{ bienes.next_page_number }}{% if buscar %}&buscar={{ buscar|urlencode }}{% endif %}">
+                Siguiente ›
+            </a>
+
+            <a href="?page={{ bienes.paginator.num_pages }}{% if buscar %}&buscar={{ buscar|urlencode }}{% endif %}">
+                Última »
+            </a>
+
+        {% endif %}
+
+
+    </div>
+
+    {% endif %}
+
 </div>
 
 
-<!-- Reporte que aparece únicamente al imprimir -->
+
+<!-- ================================= -->
+<!-- REPORTE GENERAL -->
+<!-- ================================= -->
+
 <div class="reporte-impresion">
 
-    <!-- Encabezado del reporte -->
+
+    <!-- Encabezado -->
     <div class="encabezado-reporte">
 
         <img
@@ -282,6 +503,7 @@
             class="logo-reporte"
         >
 
+
         <div class="texto-reporte">
 
             <h2>
@@ -289,7 +511,9 @@
             </h2>
 
             <p>
-                <strong>Reporte de Bienes</strong>
+                <strong>
+                    REPORTE GENERAL DE BIENES
+                </strong>
             </p>
 
             <p>
@@ -302,25 +526,39 @@
     </div>
 
 
-    <!-- Tabla del reporte -->
+    <!-- Tabla completa -->
     <table>
 
         <thead>
 
             <tr>
+
                 <th>Código</th>
+
                 <th>Bien</th>
+
                 <th>Marca</th>
+
                 <th>Modelo</th>
+
                 <th>N.º de serie</th>
+
                 <th>Estado</th>
+
+                <th>Ubicación</th>
+
             </tr>
 
         </thead>
 
+
         <tbody>
 
-            {% for bien in bienes %}
+            <!-- IMPORTANTE:
+                 aquí usamos bienes_reporte
+                 y NO la página de 20 bienes -->
+
+            {% for bien in bienes_reporte %}
 
             <tr>
 
@@ -334,34 +572,49 @@
 
                 </td>
 
+
                 <td>
                     {{ bien.nombre }}
                 </td>
+
 
                 <td>
                     {{ bien.marca|default:"-" }}
                 </td>
 
+
                 <td>
                     {{ bien.modelo|default:"-" }}
                 </td>
+
 
                 <td>
                     {{ bien.serie|default:"-" }}
                 </td>
 
+
                 <td>
                     {{ bien.estado }}
                 </td>
 
+
+                <td>
+                    {{ bien.ubicacion|default:"-" }}
+                </td>
+
             </tr>
+
 
             {% empty %}
 
             <tr>
-                <td colspan="6">
+
+                <td colspan="7">
+
                     No hay bienes registrados.
+
                 </td>
+
             </tr>
 
             {% endfor %}
@@ -371,15 +624,22 @@
     </table>
 
 
-    <!-- Total -->
-    <p style="margin-top: 10px; text-align: right;">
+    <!-- Total general -->
+    <p style="
+        margin-top: 10px;
+        text-align: right;
+        font-size: 11px;
+    ">
 
         <strong>
-            Total de bienes mostrados:
-            {{ bienes|length }}
+
+            Total de bienes:
+            {{ bienes_reporte|length }}
+
         </strong>
 
     </p>
+
 
 </div>
 

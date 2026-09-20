@@ -53,6 +53,12 @@
     margin-bottom: 6px;
 }
 
+/* Asterisco de campo obligatorio */
+.obligatorio {
+    color: #d32f2f;
+    font-weight: bold;
+}
+
 /* Inputs */
 .campo-formulario input,
 .campo-formulario select,
@@ -75,7 +81,7 @@
     box-shadow: 0 0 0 2px rgba(139, 195, 74, 0.15);
 }
 
-/* Campo dirección */
+/* Campo completo */
 .campo-completo {
     grid-column: 1 / -1;
 }
@@ -153,6 +159,7 @@
 
         <p>
             Complete la información correspondiente al custodio.
+            Los campos con <span class="obligatorio">*</span> son obligatorios.
         </p>
 
     </div>
@@ -167,11 +174,9 @@
 
             <!-- Errores generales -->
             {% if form.non_field_errors %}
-
                 <div class="error-campo">
                     {{ form.non_field_errors }}
                 </div>
-
             {% endif %}
 
 
@@ -181,7 +186,7 @@
                 <div class="campo-formulario">
 
                     <label for="{{ form.cedula.id_for_label }}">
-                        Cédula
+                        Cédula <span class="obligatorio">*</span>
                     </label>
 
                     {{ form.cedula }}
@@ -197,7 +202,7 @@
                 <div class="campo-formulario">
 
                     <label for="{{ form.telefono.id_for_label }}">
-                        Teléfono
+                        Teléfono <span class="obligatorio">*</span>
                     </label>
 
                     {{ form.telefono }}
@@ -213,7 +218,7 @@
                 <div class="campo-formulario">
 
                     <label for="{{ form.nombres.id_for_label }}">
-                        Nombres
+                        Nombres <span class="obligatorio">*</span>
                     </label>
 
                     {{ form.nombres }}
@@ -229,7 +234,7 @@
                 <div class="campo-formulario">
 
                     <label for="{{ form.apellidos.id_for_label }}">
-                        Apellidos
+                        Apellidos <span class="obligatorio">*</span>
                     </label>
 
                     {{ form.apellidos }}
@@ -245,7 +250,7 @@
                 <div class="campo-formulario">
 
                     <label for="{{ form.cargo.id_for_label }}">
-                        Cargo
+                        Cargo <span class="obligatorio">*</span>
                     </label>
 
                     {{ form.cargo }}
@@ -261,7 +266,7 @@
                 <div class="campo-formulario">
 
                     <label for="{{ form.departamento.id_for_label }}">
-                        Departamento
+                        Departamento <span class="obligatorio">*</span>
                     </label>
 
                     {{ form.departamento }}
@@ -325,7 +330,7 @@
                 <div class="campo-formulario">
 
                     <label for="{{ form.direccion.id_for_label }}">
-                        Dirección
+                        Dirección <span class="obligatorio">*</span>
                     </label>
 
                     {{ form.direccion }}

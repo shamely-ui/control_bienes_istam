@@ -1,126 +1,388 @@
 {% extends 'inventario/base.html' %}
+
 {% block contenido %}
 
-<h2>Detalle del bien</h2>
+<style>
 
-<p>Información completa del bien seleccionado.</p>
+/* Contenedor principal */
+.detalle-contenedor {
+    max-width: 950px;
+    margin: 20px auto;
+}
 
-<table>
-    <tbody>
-        <tr>
-            <th>Código</th>
-            <td>
-                {% if bien.codigo %}
-                    {{ bien.codigo }}
-                {% else %}
-                    Pendiente
-                {% endif %}
-            </td>
-        </tr>
+/* Encabezado */
+.detalle-titulo {
+    margin-bottom: 20px;
+}
 
-        <tr>
-            <th>Bien</th>
-            <td>{{ bien.nombre }}</td>
-        </tr>
+.detalle-titulo h2 {
+    color: #006633;
+    margin-bottom: 5px;
+}
 
-        <tr>
-            <th>Tipo de bien</th>
-            <td>{{ bien.tipo_bien|default:"-" }}</td>
-        </tr>
+.detalle-titulo p {
+    color: #666;
+    margin: 0;
+}
 
-        <tr>
-            <th>Marca</th>
-            <td>{{ bien.marca|default:"-" }}</td>
-        </tr>
+/* Tarjeta */
+.detalle-tarjeta {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
+    border-top: 4px solid #8bc34a;
+}
 
-        <tr>
-            <th>Modelo</th>
-            <td>{{ bien.modelo|default:"-" }}</td>
-        </tr>
+/* Parte superior */
+.detalle-superior {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
 
-        <tr>
-            <th>N.º de serie</th>
-            <td>{{ bien.serie|default:"-" }}</td>
-        </tr>
+/* Fotografía */
+.foto-contenedor {
+    width: 200px;
+    height: 180px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
 
-        <tr>
-            <th>Color</th>
-            <td>{{ bien.color|default:"-" }}</td>
-        </tr>
+.foto-bien {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-        <tr>
-            <th>Material</th>
-            <td>{{ bien.material|default:"-" }}</td>
-        </tr>
+/* Marcador cuando no existe fotografía */
+.sin-foto {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #777;
+    text-align: center;
+}
 
-        <tr>
-            <th>Características</th>
-            <td>{{ bien.caracteristicas|default:"-" }}</td>
-        </tr>
+.sin-foto-icono {
+    font-size: 50px;
+    margin-bottom: 8px;
+}
 
-        <tr>
-            <th>Estado</th>
-            <td>{{ bien.estado }}</td>
-        </tr>
+.sin-foto-texto {
+    font-size: 14px;
+    font-weight: bold;
+}
 
-        <tr>
-            <th>Condición original</th>
-            <td>{{ bien.condicion_original|default:"-" }}</td>
-        </tr>
+/* Información principal */
+.informacion-principal h3 {
+    color: #006633;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
 
-        <tr>
-            <th>Valor de compra</th>
-            <td>
-                {% if bien.valor_compra_original %}
-                    {{ bien.valor_compra_original }}
-                {% elif bien.valor_compra %}
-                    $ {{ bien.valor_compra }}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-        </tr>
+.informacion-principal p {
+    margin: 8px 0;
+}
 
-        <tr>
-            <th>Dimensiones originales</th>
-            <td>{{ bien.dimensiones_originales|default:"-" }}</td>
-        </tr>
+/* Tabla */
+.detalle-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        <tr>
-            <th>Ubicación original</th>
-            <td>{{ bien.ubicacion_original|default:"-" }}</td>
-        </tr>
+.detalle-tabla th,
+.detalle-tabla td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
 
-        <tr>
-            <th>Custodio original</th>
-            <td>{{ bien.custodio_original|default:"-" }}</td>
-        </tr>
+.detalle-tabla th {
+    width: 230px;
+    background: #f4f7f4;
+    color: #333;
+}
 
-        <tr>
-            <th>Procedencia</th>
-            <td>{{ bien.get_procedencia_display|default:"-" }}</td>
-        </tr>
+/* Botones */
+.detalle-botones {
+    margin-top: 25px;
+    display: flex;
+    gap: 10px;
+}
 
-        <tr>
-            <th>Observaciones</th>
-            <td>{{ bien.observaciones|default:"-" }}</td>
-        </tr>
+.boton-volver {
+    display: inline-block;
+    padding: 9px 18px;
+    border: 1px solid #006633;
+    border-radius: 5px;
+    color: #006633;
+    background: white;
+    text-decoration: none;
+    font-weight: bold;
+}
 
-        <tr>
-            <th>Datos adicionales originales</th>
-            <td>{{ bien.datos_adicionales_originales|default:"-" }}</td>
-        </tr>
-    </tbody>
-</table>
+.boton-volver:hover {
+    background: #f1f8e9;
+}
 
-<br>
+/* Celular */
+@media (max-width: 700px) {
 
-<a href="{% url 'editar_bien' bien.id %}" class="boton">
-    Editar
-</a>
+    .detalle-superior {
+        grid-template-columns: 1fr;
+    }
 
-<a href="{% url 'lista_bienes' %}" class="boton">
-    Volver
-</a>
+    .foto-contenedor {
+        margin: auto;
+    }
+
+}
+
+</style>
+
+
+<div class="detalle-contenedor">
+
+    <!-- Encabezado -->
+    <div class="detalle-titulo">
+
+        <h2>📦 Detalle del bien</h2>
+
+        <p>
+            Información completa del bien seleccionado.
+        </p>
+
+    </div>
+
+
+    <div class="detalle-tarjeta">
+
+        <!-- Información superior -->
+        <div class="detalle-superior">
+
+            <!-- Fotografía -->
+            <div>
+
+                <div class="foto-contenedor">
+
+                    {% if bien.foto %}
+
+                        <img
+                            src="{{ bien.foto.url }}"
+                            alt="Fotografía de {{ bien.nombre }}"
+                            class="foto-bien"
+                        >
+
+                    {% else %}
+
+                        <div class="sin-foto">
+
+                            <div class="sin-foto-icono">
+                                🖼️
+                            </div>
+
+                            <div class="sin-foto-texto">
+                                Sin fotografía
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Datos principales -->
+            <div class="informacion-principal">
+
+                <h3>
+                    {{ bien.nombre }}
+                </h3>
+
+                <p>
+                    <strong>Código:</strong>
+
+                    {% if bien.codigo %}
+                        {{ bien.codigo }}
+                    {% else %}
+                        Pendiente
+                    {% endif %}
+                </p>
+
+                <p>
+                    <strong>Estado:</strong>
+                    {{ bien.estado }}
+                </p>
+
+                <p>
+                    <strong>Categoría:</strong>
+                    {{ bien.categoria|default:"-" }}
+                </p>
+
+                <p>
+                    <strong>Ubicación:</strong>
+                    {{ bien.ubicacion|default:"-" }}
+                </p>
+
+                <p>
+                    <strong>Estado del registro:</strong>
+
+                    {% if bien.activo %}
+                        Activo
+                    {% else %}
+                        Inactivo
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Información completa -->
+        <table class="detalle-tabla">
+
+            <tbody>
+
+                <tr>
+                    <th>Tipo de bien</th>
+                    <td>{{ bien.tipo_bien|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <th>Marca</th>
+                    <td>{{ bien.marca|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <th>Modelo</th>
+                    <td>{{ bien.modelo|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <th>N.º de serie</th>
+                    <td>{{ bien.serie|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <th>Color</th>
+                    <td>{{ bien.color|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <th>Material</th>
+                    <td>{{ bien.material|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <th>Características</th>
+                    <td>{{ bien.caracteristicas|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <th>Condición original</th>
+                    <td>{{ bien.condicion_original|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <th>Valor de compra</th>
+
+                    <td>
+
+                        {% if bien.valor_compra_original %}
+
+                            {{ bien.valor_compra_original }}
+
+                        {% elif bien.valor_compra %}
+
+                            $ {{ bien.valor_compra }}
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <th>Dimensiones originales</th>
+                    <td>
+                        {{ bien.dimensiones_originales|default:"-" }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Ubicación original</th>
+                    <td>
+                        {{ bien.ubicacion_original|default:"-" }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Custodio original</th>
+                    <td>
+                        {{ bien.custodio_original|default:"-" }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Procedencia</th>
+                    <td>
+                        {{ bien.get_procedencia_display|default:"-" }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Observaciones</th>
+                    <td>
+                        {{ bien.observaciones|default:"-" }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Datos adicionales originales</th>
+                    <td>
+                        {{ bien.datos_adicionales_originales|default:"-" }}
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+
+        <!-- Botones -->
+        <div class="detalle-botones">
+
+            <a
+                href="{% url 'editar_bien' bien.id %}"
+                class="boton">
+                ✏️ Editar
+            </a>
+
+            <a
+                href="{% url 'lista_bienes' %}"
+                class="boton-volver">
+                Volver
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}

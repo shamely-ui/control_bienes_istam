@@ -29,85 +29,205 @@
 
     <hr>
 
+
     <!-- Introducción -->
     <p>
         Por medio de la presente se deja constancia de la entrega temporal
-        del siguiente bien perteneciente al Instituto Superior Tecnológico
-        Amazónico, para su uso y custodia.
+        de los siguientes bienes pertenecientes al Instituto Superior
+        Tecnológico Amazónico, para su uso y custodia.
     </p>
 
 
-    <!-- Datos del bien -->
-    <h3>Datos del bien</h3>
+    <!-- Bienes entregados -->
+    <h3>Bienes entregados</h3>
 
     <table class="tabla-acta">
 
-        <tr>
-            <th style="color: black !important;">Bien</th>
-            <td>{{ asignacion.bien.nombre }}</td>
-        </tr>
+        <thead>
 
-        <tr>
-            <th style="color: black !important;">Código</th>
-            <td>
-                {{ asignacion.bien.codigo|default:"Sin código asignado" }}
-            </td>
-        </tr>
+            <tr>
+                <th style="color: black !important;">Código</th>
+                <th style="color: black !important;">Bien</th>
+                <th style="color: black !important;">Marca</th>
+                <th style="color: black !important;">Modelo</th>
+                <th style="color: black !important;">N.º de serie</th>
+                <th style="color: black !important;">Valor</th>
+                <th style="color: black !important;">Estado</th>
+            </tr>
 
-        <tr>
-            <th style="color: black !important;">Marca</th>
-            <td>
-                {{ asignacion.bien.marca|default:"No registrado" }}
-            </td>
-        </tr>
+        </thead>
 
-        <tr>
-            <th style="color: black !important;">Modelo</th>
-            <td>
-                {{ asignacion.bien.modelo|default:"No registrado" }}
-            </td>
-        </tr>
+        <tbody>
 
-        <tr>
-            <th style="color: black !important;">N.º de serie</th>
-            <td>
-                {{ asignacion.bien.serie|default:"No registrado" }}
-            </td>
-        </tr>
+            {% for bien in asignacion.bienes.all %}
 
-        <tr>
-            <th style="color: black !important;">Valor</th>
-            <td>
-                {% if asignacion.bien.valor_compra %}
-                    $ {{ asignacion.bien.valor_compra }}
+                <tr>
+
+                    <!-- Código -->
+                    <td>
+                        {{ bien.codigo|default:"Sin código" }}
+                    </td>
+
+                    <!-- Nombre del bien -->
+                    <td>
+                        {{ bien.nombre }}
+                    </td>
+
+                    <!-- Marca -->
+                    <td>
+                        {{ bien.marca|default:"No registrado" }}
+                    </td>
+
+                    <!-- Modelo -->
+                    <td>
+                        {{ bien.modelo|default:"No registrado" }}
+                    </td>
+
+                    <!-- Serie -->
+                    <td>
+                        {{ bien.serie|default:"No registrado" }}
+                    </td>
+
+                    <!-- Valor -->
+                    <td>
+
+                        {% if bien.valor_compra %}
+
+                            $ {{ bien.valor_compra }}
+
+                        {% else %}
+
+                            No registrado
+
+                        {% endif %}
+
+                    </td>
+
+                    <!-- Estado -->
+                    <td>
+                        {{ bien.estado|default:"No registrado" }}
+                    </td>
+
+                </tr>
+
+
+            {% empty %}
+
+                <!-- Compatibilidad con asignaciones antiguas -->
+                {% if asignacion.bien %}
+
+                    <tr>
+
+                        <td>
+                            {{ asignacion.bien.codigo|default:"Sin código" }}
+                        </td>
+
+                        <td>
+                            {{ asignacion.bien.nombre }}
+                        </td>
+
+                        <td>
+                            {{ asignacion.bien.marca|default:"No registrado" }}
+                        </td>
+
+                        <td>
+                            {{ asignacion.bien.modelo|default:"No registrado" }}
+                        </td>
+
+                        <td>
+                            {{ asignacion.bien.serie|default:"No registrado" }}
+                        </td>
+
+                        <td>
+
+                            {% if asignacion.bien.valor_compra %}
+
+                                $ {{ asignacion.bien.valor_compra }}
+
+                            {% else %}
+
+                                No registrado
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ asignacion.bien.estado|default:"No registrado" }}
+                        </td>
+
+                    </tr>
+
                 {% else %}
-                    No registrado
-                {% endif %}
-            </td>
-        </tr>
 
-        <tr>
-            <th style="color: black !important;">Estado</th>
-            <td>
-                {{ asignacion.bien.estado }}
-            </td>
-        </tr>
+                    <tr>
+
+                        <td colspan="7">
+                            No hay bienes registrados en esta asignación.
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+            {% endfor %}
+
+        </tbody>
 
     </table>
 
 
-    <!-- Accesorios -->
-    <h3>Accesorios entregados</h3>
+    <!-- Accesorios / características -->
+    <h3>Accesorios o características</h3>
 
     <table class="tabla-acta">
 
-        <tr>
-            <th style="color: black !important;">Detalle</th>
+        <thead>
 
-            <td>
-                {{ asignacion.bien.caracteristicas|default:"No se registraron accesorios"|linebreaksbr }}
-            </td>
-        </tr>
+            <tr>
+                <th style="color: black !important;">Bien</th>
+                <th style="color: black !important;">Detalle</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for bien in asignacion.bienes.all %}
+
+                <tr>
+
+                    <td>
+                        {{ bien.nombre }}
+                    </td>
+
+                    <td>
+                        {{ bien.caracteristicas|default:"No se registraron accesorios"|linebreaksbr }}
+                    </td>
+
+                </tr>
+
+            {% empty %}
+
+                {% if asignacion.bien %}
+
+                    <tr>
+
+                        <td>
+                            {{ asignacion.bien.nombre }}
+                        </td>
+
+                        <td>
+                            {{ asignacion.bien.caracteristicas|default:"No se registraron accesorios"|linebreaksbr }}
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+            {% endfor %}
+
+        </tbody>
 
     </table>
 
@@ -128,6 +248,7 @@
 
         <tr>
             <th style="color: black !important;">Cédula</th>
+
             <td>
                 {{ asignacion.custodio.cedula }}
             </td>
@@ -135,6 +256,7 @@
 
         <tr>
             <th style="color: black !important;">Cargo</th>
+
             <td>
                 {{ asignacion.custodio.cargo|default:"No registrado" }}
             </td>
@@ -142,6 +264,7 @@
 
         <tr>
             <th style="color: black !important;">Carrera</th>
+
             <td>
                 {{ asignacion.custodio.carrera|default:"No registrado" }}
             </td>
@@ -149,6 +272,7 @@
 
         <tr>
             <th style="color: black !important;">Ciclo</th>
+
             <td>
                 {{ asignacion.custodio.ciclo|default:"No registrado" }}
             </td>
@@ -156,6 +280,7 @@
 
         <tr>
             <th style="color: black !important;">Teléfono</th>
+
             <td>
                 {{ asignacion.custodio.telefono|default:"No registrado" }}
             </td>
@@ -163,6 +288,7 @@
 
         <tr>
             <th style="color: black !important;">Dirección</th>
+
             <td>
                 {{ asignacion.custodio.direccion|default:"No registrado" }}
             </td>
@@ -178,11 +304,16 @@
         <strong>Fecha de entrega:</strong>
 
         {% if asignacion.fecha_asignacion %}
+
             {{ asignacion.fecha_asignacion|date:"d/m/Y" }}
+
         {% else %}
+
             Pendiente
+
         {% endif %}
     </p>
+
 
     <p>
         <strong>Observaciones:</strong>
@@ -194,7 +325,7 @@
     <h3>Condiciones de uso y responsabilidad</h3>
 
     <p>
-        El bien entregado será utilizado exclusivamente para actividades
+        Los bienes entregados serán utilizados exclusivamente para actividades
         relacionadas con las funciones o actividades autorizadas por el
         Instituto Superior Tecnológico Amazónico.
     </p>
@@ -206,26 +337,26 @@
     <ol>
 
         <li>
-            Mantener el bien y sus accesorios en buen estado de conservación.
+            Mantener los bienes y sus accesorios en buen estado de conservación.
         </li>
 
         <li>
             No prestar, vender, transferir, desarmar, modificar ni entregar
-            el bien a terceras personas.
+            los bienes a terceras personas.
         </li>
 
         <li>
             Informar inmediatamente cualquier daño, pérdida, robo,
-            deterioro o novedad relacionada con el bien.
+            deterioro o novedad relacionada con los bienes.
         </li>
 
         <li>
-            Permitir la revisión del bien cuando la institución lo requiera.
+            Permitir la revisión de los bienes cuando la institución lo requiera.
         </li>
 
         <li>
-            Devolver el bien en las mismas condiciones en las que fue
-            recibido, salvo el desgaste normal por su utilización.
+            Devolver los bienes en las mismas condiciones en las que fueron
+            recibidos, salvo el desgaste normal por su utilización.
         </li>
 
         <li>
@@ -235,8 +366,9 @@
 
     </ol>
 
+
     <p>
-        Se deja constancia de que el bien pertenece al Instituto Superior
+        Se deja constancia de que los bienes pertenecen al Instituto Superior
         Tecnológico Amazónico y que su uso, conservación, custodia y
         devolución estarán sujetos a las disposiciones institucionales
         aplicables.
@@ -265,7 +397,9 @@
                 Gestión Administrativa Financiera
             </p>
 
-            <p>ISTAM</p>
+            <p>
+                ISTAM
+            </p>
 
         </div>
 

@@ -42,6 +42,13 @@ class CustodioForm(forms.ModelForm):
             'activo'
         ]
 
+    # Define teléfono y dirección como campos obligatorios
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['telefono'].required = True
+        self.fields['direccion'].required = True
+
 # Formulario para importar custodios desde Excel
 class ImportarCustodiosForm(forms.Form):
 
@@ -62,55 +69,26 @@ class AsignacionForm(forms.ModelForm):
 
     class Meta:
         model = Asignacion
-        fields = '__all__'
 
+        # Los bienes se seleccionan con el buscador
+        fields = [
+            'custodio',
+            'numero_acta',
+            'fecha_asignacion',
+            'fecha_prevista_devolucion',
+            'observaciones',
+            'activa'
+        ]
+
+        # Calendarios para las fechas
         widgets = {
             'fecha_asignacion': forms.DateInput(
                 attrs={'type': 'date'}
             ),
-            'fecha_devolucion': forms.DateInput(
+            'fecha_prevista_devolucion': forms.DateInput(
                 attrs={'type': 'date'}
             ),
         }
-
-    # Muestra solo bienes disponibles
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        bienes_ocupados = Asignacion.objects.filter(
-            fecha_devolucion__isnull=True
-        ).values_list('bien_id', flat=True)
-
-        self.fields['bien'].queryset = Bien.objects.filter(
-            activo=True
-        ).exclude(
-            id__in=bienes_ocupados
-        )
-
-    # Evita asignar un bien que aún no ha sido devuelto
-    def clean(self):
-        cleaned_data = super().clean()
-
-        bien = cleaned_data.get('bien')
-        fecha_devolucion = cleaned_data.get('fecha_devolucion')
-
-        if bien and not fecha_devolucion:
-            asignacion_activa = Asignacion.objects.filter(
-                bien=bien,
-                fecha_devolucion__isnull=True
-            )
-
-            if self.instance.pk:
-                asignacion_activa = asignacion_activa.exclude(
-                    pk=self.instance.pk
-                )
-
-            if asignacion_activa.exists():
-                raise forms.ValidationError(
-                    'Este bien ya está asignado a otro custodio.'
-                )
-
-        return cleaned_data
 # Formulario para registrar constataciones
 class ConstatacionForm(forms.ModelForm):
 

@@ -1,244 +1,318 @@
 """
 URL configuration for control_bienes project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path
+from django.contrib.auth import views as auth_views
+
+# Permite mostrar las fotografías subidas durante el desarrollo
+from django.conf import settings
+from django.conf.urls.static import static
+
 from inventario import views
 
+
 urlpatterns = [
+
+    # Administración
     path('admin/', admin.site.urls),
 
     # Página principal
     path('', views.dashboard, name='dashboard'),
 
-    # Lista de categorías
-    path('categorias/', views.lista_categorias, name='lista_categorias'),
 
-    # Formulario para registrar una nueva categoría
-    path('categorias/nueva/', views.nueva_categoria, name='nueva_categoria'),
+    # ==========================
+    # CATEGORÍAS
+    # ==========================
 
-    # Editar una categoría
-    path('categorias/editar/<int:id>/', views.editar_categoria, name='editar_categoria'),
+    path(
+        'categorias/',
+        views.lista_categorias,
+        name='lista_categorias'
+    ),
 
-    # Activa o desactiva una categoría
-    path('categorias/estado/<int:id>/',views.cambiar_estado_categoria, name='cambiar_estado_categoria'),
+    path(
+        'categorias/nueva/',
+        views.nueva_categoria,
+        name='nueva_categoria'
+    ),
 
-    # Lista de ubicaciones
+    path(
+        'categorias/editar/<int:id>/',
+        views.editar_categoria,
+        name='editar_categoria'
+    ),
+
+    path(
+        'categorias/estado/<int:id>/',
+        views.cambiar_estado_categoria,
+        name='cambiar_estado_categoria'
+    ),
+
+
+    # ==========================
+    # UBICACIONES
+    # ==========================
+
     path(
         'ubicaciones/',
         views.lista_ubicaciones,
         name='lista_ubicaciones'
     ),
 
-
-    # Nueva ubicación
     path(
         'ubicaciones/nueva/',
         views.nueva_ubicacion,
         name='nueva_ubicacion'
     ),
 
-    # Editar ubicación
     path(
         'ubicaciones/editar/<int:id>/',
         views.editar_ubicacion,
         name='editar_ubicacion'
     ),
 
-
-    # Activa o desactiva una ubicación
     path(
-    'ubicaciones/estado/<int:id>/',
-    views.cambiar_estado_ubicacion,
-    name='cambiar_estado_ubicacion'
+        'ubicaciones/estado/<int:id>/',
+        views.cambiar_estado_ubicacion,
+        name='cambiar_estado_ubicacion'
     ),
 
 
-    # Lista de custodios
+    # ==========================
+    # CUSTODIOS
+    # ==========================
+
     path(
-    'custodios/',
-    views.lista_custodios,
-    name='lista_custodios'
+        'custodios/',
+        views.lista_custodios,
+        name='lista_custodios'
     ),
 
-    # Nuevo custodio
     path(
-    'custodios/nuevo/',
-    views.nuevo_custodio,
-    name='nuevo_custodio'
-),
+        'custodios/nuevo/',
+        views.nuevo_custodio,
+        name='nuevo_custodio'
+    ),
 
-# Editar custodio
-path(
-    'custodios/editar/<int:id>/',
-    views.editar_custodio,
-    name='editar_custodio'
-),
+    path(
+        'custodios/editar/<int:id>/',
+        views.editar_custodio,
+        name='editar_custodio'
+    ),
 
-# Activa o desactiva un custodio
-path(
-    'custodios/estado/<int:id>/',
-    views.cambiar_estado_custodio,
-    name='cambiar_estado_custodio'
-),
+    path(
+        'custodios/estado/<int:id>/',
+        views.cambiar_estado_custodio,
+        name='cambiar_estado_custodio'
+    ),
 
-# Lista de bienes
-path(
-    'bienes/',
-    views.lista_bienes,
-    name='lista_bienes'
-),
-
-# Ver detalle de un bien
-path(
-    'bienes/detalle/<int:id>/',
-    views.detalle_bien,
-    name='detalle_bien'
-),
-
-# Nuevo bien
-path(
-    'bienes/nuevo/',
-    views.nuevo_bien,
-    name='nuevo_bien'
-),
-
-# Editar bien
-path(
-    'bienes/editar/<int:id>/',
-    views.editar_bien,
-    name='editar_bien'
-),
-# Activar o desactivar bien
-path(
-    'bienes/estado/<int:id>/',
-    views.cambiar_estado_bien,
-    name='cambiar_estado_bien'
-),
-# Lista de asignaciones
-path(
-    'asignaciones/',
-    views.lista_asignaciones,
-    name='lista_asignaciones'
-),
-
-# Nueva asignación
-path(
-    'asignaciones/nueva/',
-    views.nueva_asignacion,
-    name='nueva_asignacion'
-),
-
-# Editar asignación
-path(
-    'asignaciones/editar/<int:id>/',
-    views.editar_asignacion,
-    name='editar_asignacion'
-),
-
-# Registrar devolución
-path(
-    'asignaciones/devolucion/<int:id>/',
-    views.registrar_devolucion,
-    name='registrar_devolucion'
-),
-
-# Lista de constataciones
-path(
-    'constataciones/',
-    views.lista_constataciones,
-    name='lista_constataciones'
-),
-
-# Nueva constatación
-path(
-    'constataciones/nueva/',
-    views.nueva_constatacion,
-    name='nueva_constatacion'
-),
-
-# Editar constatación
-path(
-    'constataciones/editar/<int:id>/',
-    views.editar_constatacion,
-    name='editar_constatacion'
-),
-
-# Lista de bajas
-path(
-    'bajas/',
-    views.lista_bajas,
-    name='lista_bajas'
-),
-
-# Nueva baja
-path(
-    'bajas/nueva/',
-    views.nueva_baja,
-    name='nueva_baja'
-),
-
-# Reportes
-path(
-    'reportes/',
-    views.reportes,
-    name='reportes'
-),
+    path(
+        'custodios/importar/',
+        views.importar_custodios,
+        name='importar_custodios'
+    ),
 
 
-# Inicio de sesión
-path(
-    'login/',
-    views.iniciar_sesion,
-    name='login'
-),
+    # ==========================
+    # BIENES
+    # ==========================
 
-# Cerrar sesión
-path(
-    'logout/',
-    views.cerrar_sesion,
-    name='logout'
-),
+    path(
+        'bienes/',
+        views.lista_bienes,
+        name='lista_bienes'
+    ),
 
-# Acta de entrega-recepción
-path(
-    'asignaciones/acta/<int:id>/',
-    views.acta_asignacion,
-    name='acta_asignacion'
-),
+    path(
+        'bienes/detalle/<int:id>/',
+        views.detalle_bien,
+        name='detalle_bien'
+    ),
 
-# Importar bienes desde Excel
-path(
-    'bienes/importar/',
-    views.importar_bienes,
-    name='importar_bienes'
-),
+    path(
+        'bienes/nuevo/',
+        views.nuevo_bien,
+        name='nuevo_bien'
+    ),
 
-path(
-    'custodios/importar/',
-    views.importar_custodios,
-    name='importar_custodios'
-),
+    path(
+        'bienes/editar/<int:id>/',
+        views.editar_bien,
+        name='editar_bien'
+    ),
 
-# Importar matriz de entrega de actas
-path(
-    'asignaciones/importar-actas/',
-    views.importar_matriz_actas,
-    name='importar_matriz_actas'
-),
+    path(
+        'bienes/estado/<int:id>/',
+        views.cambiar_estado_bien,
+        name='cambiar_estado_bien'
+    ),
+
+    path(
+        'bienes/importar/',
+        views.importar_bienes,
+        name='importar_bienes'
+    ),
+
+
+    # ==========================
+    # ASIGNACIONES
+    # ==========================
+
+    path(
+        'asignaciones/',
+        views.lista_asignaciones,
+        name='lista_asignaciones'
+    ),
+
+    path(
+        'asignaciones/nueva/',
+        views.nueva_asignacion,
+        name='nueva_asignacion'
+    ),
+
+    path(
+        'asignaciones/editar/<int:id>/',
+        views.editar_asignacion,
+        name='editar_asignacion'
+    ),
+
+    path(
+        'asignaciones/devolucion/<int:id>/',
+        views.registrar_devolucion,
+        name='registrar_devolucion'
+    ),
+
+    path(
+        'asignaciones/acta/<int:id>/',
+        views.acta_asignacion,
+        name='acta_asignacion'
+    ),
+
+    path(
+        'asignaciones/eliminar/<int:id>/',
+        views.eliminar_asignacion,
+        name='eliminar_asignacion'
+    ),
+
+    path(
+        'asignaciones/importar-actas/',
+        views.importar_matriz_actas,
+        name='importar_matriz_actas'
+    ),
+
+
+    # ==========================
+    # CONSTATACIONES
+    # ==========================
+
+    path(
+        'constataciones/',
+        views.lista_constataciones,
+        name='lista_constataciones'
+    ),
+
+    path(
+        'constataciones/nueva/',
+        views.nueva_constatacion,
+        name='nueva_constatacion'
+    ),
+
+    path(
+        'constataciones/editar/<int:id>/',
+        views.editar_constatacion,
+        name='editar_constatacion'
+    ),
+
+
+    # ==========================
+    # BAJAS
+    # ==========================
+
+    path(
+        'bajas/',
+        views.lista_bajas,
+        name='lista_bajas'
+    ),
+
+    path(
+        'bajas/nueva/',
+        views.nueva_baja,
+        name='nueva_baja'
+    ),
+
+
+    # ==========================
+    # REPORTES
+    # ==========================
+
+    path(
+        'reportes/',
+        views.reportes,
+        name='reportes'
+    ),
+
+
+    # ==========================
+    # RECUPERACIÓN DE CONTRASEÑA
+    # ==========================
+
+    path(
+        'recuperar-password/',
+        auth_views.PasswordResetView.as_view(
+            template_name='inventario/recuperar_password.html'
+        ),
+        name='recuperar_password'
+    ),
+
+    path(
+        'recuperar-password/enviado/',
+        auth_views.PasswordResetDoneView.as_view(
+            template_name='inventario/recuperar_password_enviado.html'
+        ),
+        name='password_reset_done'
+    ),
+
+    path(
+        'restablecer-password/<uidb64>/<token>/',
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name='inventario/restablecer_password.html'
+        ),
+        name='password_reset_confirm'
+    ),
+
+    path(
+        'restablecer-password/completado/',
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name='inventario/password_completado.html'
+        ),
+        name='password_reset_complete'
+    ),
+
+
+    # ==========================
+    # SESIÓN
+    # ==========================
+
+    path(
+        'login/',
+        views.iniciar_sesion,
+        name='login'
+    ),
+
+    path(
+        'logout/',
+        views.cerrar_sesion,
+        name='logout'
+    ),
+
 ]
 
 
+# Permite visualizar fotografías guardadas en MEDIA durante el desarrollo
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )

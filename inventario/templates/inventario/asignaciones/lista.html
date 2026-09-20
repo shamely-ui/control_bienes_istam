@@ -3,20 +3,17 @@
 {% block contenido %}
 
 <style>
-
-/* El reporte permanece oculto en pantalla */
+/* Reporte oculto en pantalla */
 .reporte-impresion {
     display: none;
 }
 
-/* Encabezado del reporte */
 .encabezado-reporte {
     position: relative;
     min-height: 95px;
     margin-bottom: 10px;
 }
 
-/* Logo institucional */
 .logo-reporte {
     position: absolute;
     left: 0;
@@ -25,22 +22,27 @@
     height: auto;
 }
 
-/* Texto central del reporte */
 .texto-reporte {
     width: 100%;
     text-align: center;
     padding-top: 5px;
 }
 
-.texto-reporte h2 {
-    margin: 0;
-}
-
+.texto-reporte h2,
 .texto-reporte p {
     margin: 2px 0;
 }
 
-/* Configuración para imprimir */
+/* Bienes dentro de la tabla */
+.bien-asignado {
+    margin-bottom: 8px;
+}
+
+.bien-asignado:last-child {
+    margin-bottom: 0;
+}
+
+/* Impresión */
 @media print {
 
     header,
@@ -59,7 +61,7 @@
         width: 100%;
         border-collapse: collapse;
         margin-top: 12px;
-        font-size: 10px;
+        font-size: 9px;
     }
 
     .reporte-impresion th,
@@ -67,6 +69,7 @@
         border: 1px solid #333;
         padding: 5px;
         text-align: left;
+        vertical-align: top;
     }
 
     .reporte-impresion th {
@@ -74,13 +77,12 @@
         color: black !important;
     }
 }
-
 </style>
 
 
 <!-- =====================================================
-     VISTA NORMAL DEL SISTEMA
-     ===================================================== -->
+     VISTA NORMAL
+===================================================== -->
 
 <div class="vista-pantalla">
 
@@ -94,19 +96,14 @@
 
         <div class="modulo-acciones">
 
-            <!-- Nueva asignación -->
-            <a href="{% url 'nueva_asignacion' %}"
-               class="boton">
+            <a href="{% url 'nueva_asignacion' %}" class="boton">
                 + Nueva asignación
             </a>
 
-            <!-- Importar matriz -->
-            <a href="{% url 'importar_matriz_actas' %}"
-               class="boton">
+            <a href="{% url 'importar_matriz_actas' %}" class="boton">
                 📥 Importar matriz
             </a>
 
-            <!-- Imprimir reporte -->
             <button
                 type="button"
                 class="boton"
@@ -161,15 +158,16 @@
             Buscar
         </button>
 
-        <a href="{% url 'lista_asignaciones' %}"
-           class="boton-limpiar">
+        <a
+            href="{% url 'lista_asignaciones' %}"
+            class="boton-limpiar">
             Limpiar
         </a>
 
     </form>
 
 
-    <!-- Tabla normal -->
+    <!-- Tabla -->
     <div class="tabla-contenedor">
 
         <table>
@@ -180,7 +178,8 @@
                     <th>Bien</th>
                     <th>Custodio</th>
                     <th>Fecha asignación</th>
-                    <th>Fecha devolución</th>
+                    <th>Fecha prevista</th>
+                    <th>Estado / devolución</th>
                     <th>Observaciones</th>
                     <th>Acciones</th>
                 </tr>
@@ -193,22 +192,49 @@
 
                 <tr>
 
-                    <!-- Bien -->
+                    <!-- Bienes -->
                     <td>
 
-                        <strong>
-                            {{ asignacion.bien.nombre }}
-                        </strong>
+                        {% for bien in asignacion.bienes.all %}
 
-                        <div class="texto-secundario">
+                            <div class="bien-asignado">
 
-                            {% if asignacion.bien.codigo %}
-                                {{ asignacion.bien.codigo }}
+                                <strong>
+                                    {{ bien.nombre }}
+                                </strong>
+
+                                <div class="texto-secundario">
+
+                                    {% if bien.codigo %}
+                                        {{ bien.codigo }}
+                                    {% else %}
+                                        Sin código
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <!-- Compatibilidad con registros antiguos -->
+                            {% if asignacion.bien %}
+
+                                <strong>
+                                    {{ asignacion.bien.nombre }}
+                                </strong>
+
+                                <div class="texto-secundario">
+                                    {{ asignacion.bien.codigo|default:"Sin código" }}
+                                </div>
+
                             {% else %}
-                                Sin código
+
+                                Sin bienes registrados
+
                             {% endif %}
 
-                        </div>
+                        {% endfor %}
 
                     </td>
 
@@ -237,7 +263,25 @@
                     </td>
 
 
-                    <!-- Fecha de devolución -->
+                    <!-- Fecha prevista -->
+                    <td>
+
+                        {% if asignacion.fecha_prevista_devolucion %}
+
+                            {{ asignacion.fecha_prevista_devolucion|date:"d/m/Y" }}
+
+                        {% else %}
+
+                            <span class="texto-secundario">
+                                Sin fecha prevista
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- Estado y devolución real -->
                     <td>
 
                         {% if asignacion.fecha_devolucion %}
@@ -272,33 +316,52 @@
 
                         <div class="acciones-botones">
 
-                            <!-- Editar -->
                             <a
                                 href="{% url 'editar_asignacion' asignacion.id %}"
-                                class="btn-accion btn-editar"
-                            >
+                                class="btn-accion btn-editar">
                                 ✏️ Editar
                             </a>
 
-                            <!-- Ver acta -->
                             <a
                                 href="{% url 'acta_asignacion' asignacion.id %}"
-                                class="btn-accion btn-acta"
-                            >
+                                class="btn-accion btn-acta">
                                 📄 Ver acta
                             </a>
 
-                            <!-- Registrar devolución -->
                             {% if not asignacion.fecha_devolucion %}
 
                                 <a
                                     href="{% url 'registrar_devolucion' asignacion.id %}"
-                                    class="btn-accion btn-devolucion"
-                                >
+                                    class="btn-accion btn-devolucion">
                                     ↩ Registrar devolución
                                 </a>
 
                             {% endif %}
+
+
+                            <!-- Eliminar solo la asignación -->
+                            <form
+                                method="POST"
+                                action="{% url 'eliminar_asignacion' asignacion.id %}"
+                                style="display: inline;"
+                                onsubmit="return confirm('¿Está seguro de eliminar esta asignación? Los bienes y el custodio no se eliminarán.');"
+                            >
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="btn-accion"
+                                    style="
+                                        background: #b00020;
+                                        color: white;
+                                        border: none;
+                                        cursor: pointer;
+                                    ">
+                                    🗑️ Eliminar
+                                </button>
+
+                            </form>
 
                         </div>
 
@@ -306,15 +369,13 @@
 
                 </tr>
 
+
                 {% empty %}
 
                 <tr>
 
-                    <td colspan="6"
-                        class="tabla-vacia">
-
+                    <td colspan="7" class="tabla-vacia">
                         No hay asignaciones registradas.
-
                     </td>
 
                 </tr>
@@ -342,11 +403,11 @@
 
 <!-- =====================================================
      REPORTE PARA IMPRESIÓN
-     ===================================================== -->
+===================================================== -->
 
 <div class="reporte-impresion">
 
-    <!-- Encabezado institucional -->
+    <!-- Encabezado -->
     <div class="encabezado-reporte">
 
         <img
@@ -384,12 +445,12 @@
 
             <tr>
                 <th>N.º de acta</th>
-                <th>Bien</th>
-                <th>Código</th>
+                <th>Bienes</th>
                 <th>Custodio</th>
                 <th>Fecha asignación</th>
+                <th>Fecha prevista</th>
                 <th>Estado</th>
-                <th>Fecha devolución</th>
+                <th>Fecha devolución real</th>
             </tr>
 
         </thead>
@@ -406,24 +467,41 @@
                 </td>
 
 
-                <!-- Bien -->
-                <td>
-                    {{ asignacion.bien.nombre }}
-                </td>
-
-
-                <!-- Código -->
+                <!-- Varios bienes -->
                 <td>
 
-                    {% if asignacion.bien.codigo %}
+                    {% for bien in asignacion.bienes.all %}
 
-                        {{ asignacion.bien.codigo }}
+                        <div style="margin-bottom: 4px;">
 
-                    {% else %}
+                            <strong>
+                                {{ bien.nombre }}
+                            </strong>
 
-                        Sin código
+                            {% if bien.codigo %}
+                                - {{ bien.codigo }}
+                            {% endif %}
 
-                    {% endif %}
+                        </div>
+
+                    {% empty %}
+
+                        <!-- Registros antiguos -->
+                        {% if asignacion.bien %}
+
+                            {{ asignacion.bien.nombre }}
+
+                            {% if asignacion.bien.codigo %}
+                                - {{ asignacion.bien.codigo }}
+                            {% endif %}
+
+                        {% else %}
+
+                            Sin bienes
+
+                        {% endif %}
+
+                    {% endfor %}
 
                 </td>
 
@@ -434,17 +512,25 @@
                 </td>
 
 
-                <!-- Fecha de asignación -->
+                <!-- Fecha asignación -->
                 <td>
 
                     {% if asignacion.fecha_asignacion %}
-
                         {{ asignacion.fecha_asignacion|date:"d/m/Y" }}
-
                     {% else %}
+                        -
+                    {% endif %}
 
-                        Sin fecha registrada
+                </td>
 
+
+                <!-- Fecha prevista -->
+                <td>
+
+                    {% if asignacion.fecha_prevista_devolucion %}
+                        {{ asignacion.fecha_prevista_devolucion|date:"d/m/Y" }}
+                    {% else %}
+                        -
                     {% endif %}
 
                 </td>
@@ -454,34 +540,27 @@
                 <td>
 
                     {% if asignacion.fecha_devolucion %}
-
                         Devuelto
-
                     {% else %}
-
                         Pendiente
-
                     {% endif %}
 
                 </td>
 
 
-                <!-- Fecha de devolución -->
+                <!-- Fecha devolución real -->
                 <td>
 
                     {% if asignacion.fecha_devolucion %}
-
                         {{ asignacion.fecha_devolucion|date:"d/m/Y" }}
-
                     {% else %}
-
                         -
-
                     {% endif %}
 
                 </td>
 
             </tr>
+
 
             {% empty %}
 
@@ -500,7 +579,7 @@
     </table>
 
 
-    <!-- Total de asignaciones -->
+    <!-- Total -->
     <p style="margin-top: 10px; text-align: right;">
 
         <strong>
